@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Cards Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .console-output {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Exercise Cards Test</h1>
+        
+        <div class="status info">
+            <strong>Instructions:</strong><br>
+            1. Click "Test Main Application" to open the main app<br>
+            2. Click the "Wellness Center" button (orange button in the main app)<br>
+            3. Look for three exercise cards in the opened panel<br>
+            4. Click on any exercise card to test functionality
+        </div>
+        
+        <button class="btn" onclick="openMainApp()">🚀 Test Main Application</button>
+        <button class="btn" onclick="clearConsole()">🧹 Clear Console</button>
+        
+        <h2>Console Output:</h2>
+        <div id="console" class="console-output">Click "Test Main Application" to start...</div>
+        
+        <h2>Expected Behavior:</h2>
+        <div class="status success">
+            ✅ When you click "Wellness Center" button, a panel should slide in from the right<br>
+            ✅ Inside the panel, you should see 3 exercise cards:<br>
+            &nbsp;&nbsp;&nbsp;- 🫁 Breathing Exercise<br>
+            &nbsp;&nbsp;&nbsp;- ✋ Office Stretching<br>
+            &nbsp;&nbsp;&nbsp;- 💬 Motivational Quote<br>
+            ✅ Clicking any card should open a modal with the respective exercise
+        </div>
+        
+        <h2>Troubleshooting:</h2>
+        <div class="status error">
+            ❌ If cards don't appear: Check browser console (F12) for JavaScript errors<br>
+            ❌ If panel doesn't open: Check if wellness button has click event listener<br>
+            ❌ If modals don't open: Check if wellness-modals.js is loaded properly
+        </div>
+    </div>
+    
+    <script>
+        function openMainApp() {
+            const consoleDiv = document.getElementById('console');
+            consoleDiv.innerHTML = 'Opening main application at http://localhost:5000\n';
+            consoleDiv.innerHTML += 'Opening in new window...\n';
+            
+            // Open main app in new window
+            const newWindow = window.open('http://localhost:5000', '_blank');
+            
+            consoleDiv.innerHTML += 'Main application opened.\n';
+            consoleDiv.innerHTML += 'Instructions:\n';
+            consoleDiv.innerHTML += '1. Look for the orange "Wellness Center" button\n';
+            consoleDiv.innerHTML += '2. Click it to open the wellness panel\n';
+            consoleDiv.innerHTML += '3. Click on any of the 3 exercise cards\n';
+            consoleDiv.innerHTML += '4. Check browser console (F12) for debug messages\n';
+            
+            if (!newWindow) {
+                consoleDiv.innerHTML += '\n❌ ERROR: Popup blocked! Please allow popups or manually open http://localhost:5000\n';
+            }
+        }
+        
+        function clearConsole() {
+            document.getElementById('console').innerHTML = 'Console cleared.\n';
+        }
+    </script>
+</body>
+</html>

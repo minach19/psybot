@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Complet - Avatars Humains et Fluides</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="static/css/avatar-exercise-animations.css" rel="stylesheet">
+    <link href="static/css/human-avatar-animations.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .test-header {
+            background: linear-gradient(135deg, #4fc3f7, #81c784);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .test-content {
+            padding: 30px;
+        }
+        .avatar-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .avatar-type-btn {
+            margin: 5px;
+            min-width: 150px;
+        }
+        .exercise-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .exercise-btn {
+            margin: 5px;
+            min-width: 120px;
+        }
+        .demo-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h1><i class="fas fa-user"></i> Test Complet des Avatars Humains</h1>
+                        <p>Démonstration des trois systèmes d'avatar pour les exercices de bien-être</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Avatar Classique -->
+            <div class="col-lg-4">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3><i class="fas fa-smile"></i> Avatar Classique</h3>
+                        <p>Style emoji avec animations CSS</p>
+                    </div>
+                    <div class="test-content">
+                        <div id="classicAvatarContainer">
+                            <!-- L'avatar classique sera injecté ici -->
+                        </div>
+                        <div class="exercise-controls">
+                            <button class="btn btn-primary exercise-btn" onclick="testClassicBreathing()">
+                                <i class="fas fa-lungs"></i> Respiration
+                            </button>
+                            <button class="btn btn-success exercise-btn" onclick="testClassicStretching()">
+                                <i class="fas fa-hand-paper"></i> Étirements
+                            </button>
+                            <button class="btn btn-warning exercise-btn" onclick="testClassicMotivation()">
+                                <i class="fas fa-star"></i> Motivation
+                            </button>
+                            <button class="btn btn-secondary exercise-btn" onclick="stopClassicExercise()">
+                                <i class="fas fa-stop"></i> Arrêter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avatar Humain -->
+            <div class="col-lg-4">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3><i class="fas fa-user-friends"></i> Avatar Humain</h3>
+                        <p>Représentation humaine réaliste</p>
+                    </div>
+                    <div class="test-content">
+                        <div id="humanAvatarContainer">
+                            <!-- L'avatar humain sera injecté ici -->
+                        </div>
+                        <div class="exercise-controls">
+                            <button class="btn btn-primary exercise-btn" onclick="testHumanBreathing()">
+                                <i class="fas fa-lungs"></i> Respiration
+                            </button>
+                            <button class="btn btn-success exercise-btn" onclick="testHumanStretching()">
+                                <i class="fas fa-hand-paper"></i> Étirements
+                            </button>
+                            <button class="btn btn-warning exercise-btn" onclick="testHumanMotivation()">
+                                <i class="fas fa-star"></i> Motivation
+                            </button>
+                            <button class="btn btn-secondary exercise-btn" onclick="stopHumanExercise()">
+                                <i class="fas fa-stop"></i> Arrêter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avatar SVG Fluide -->
+            <div class="col-lg-4">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3><i class="fas fa-magic"></i> Avatar SVG Fluide</h3>
+                        <p>Animations vectorielles fluides</p>
+                    </div>
+                    <div class="test-content">
+                        <div id="svgAvatarContainer">
+                            <!-- L'avatar SVG sera injecté ici -->
+                        </div>
+                        <div class="exercise-controls">
+                            <button class="btn btn-primary exercise-btn" onclick="testSVGBreathing()">
+                                <i class="fas fa-lungs"></i> Respiration
+                            </button>
+                            <button class="btn btn-success exercise-btn" onclick="testSVGStretching()">
+                                <i class="fas fa-hand-paper"></i> Étirements
+                            </button>
+                            <button class="btn btn-warning exercise-btn" onclick="testSVGMotivation()">
+                                <i class="fas fa-star"></i> Motivation
+                            </button>
+                            <button class="btn btn-secondary exercise-btn" onclick="stopSVGExercise()">
+                                <i class="fas fa-stop"></i> Arrêter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3><i class="fas fa-info-circle"></i> Comparaison des Systèmes</h3>
+                    </div>
+                    <div class="test-content">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="demo-info">
+                                    <h5><i class="fas fa-smile"></i> Avatar Classique</h5>
+                                    <ul>
+                                        <li>Simple et léger</li>
+                                        <li>Expressions emoji</li>
+                                        <li>Animations CSS fluides</li>
+                                        <li>Compatible tous navigateurs</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="demo-info">
+                                    <h5><i class="fas fa-user-friends"></i> Avatar Humain</h5>
+                                    <ul>
+                                        <li>Représentation réaliste</li>
+                                        <li>Mouvements anatomiques</li>
+                                        <li>Instructions détaillées</li>
+                                        <li>Focus anatomique</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="demo-info">
+                                    <h5><i class="fas fa-magic"></i> Avatar SVG</h5>
+                                    <ul>
+                                        <li>Animations vectorielles</li>
+                                        <li>Très fluide</li>
+                                        <li>Scalable et net</li>
+                                        <li>Effets visuels avancés</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="test-card">
+                    <div class="test-header">
+                        <h3><i class="fas fa-cogs"></i> Contrôles Globaux</h3>
+                    </div>
+                    <div class="test-content text-center">
+                        <button class="btn btn-outline-primary btn-lg mx-2" onclick="startAllBreathing()">
+                            <i class="fas fa-lungs"></i> Tous en Respiration
+                        </button>
+                        <button class="btn btn-outline-success btn-lg mx-2" onclick="startAllStretching()">
+                            <i class="fas fa-hand-paper"></i> Tous en Étirements
+                        </button>
+                        <button class="btn btn-outline-danger btn-lg mx-2" onclick="stopAllExercises()">
+                            <i class="fas fa-stop"></i> Arrêter Tous
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="static/js/avatar-exercise-guide.js"></script>
+    <script src="static/js/human-avatar-guide.js"></script>
+    <script src="static/js/fluid-svg-avatar.js"></script>
+
+    <script>
+        // Variables globales
+        let classicAvatar, humanAvatar, svgAvatar;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAllAvatars();
+        });
+
+        function initializeAllAvatars() {
+            // Avatar classique
+            if (typeof AvatarExerciseGuide !== 'undefined') {
+                classicAvatar = new AvatarExerciseGuide();
+                injectClassicAvatar();
+                console.log('✅ Avatar classique initialisé');
+            }
+
+            // Avatar humain
+            if (typeof HumanAvatarGuide !== 'undefined') {
+                humanAvatar = new HumanAvatarGuide();
+                injectHumanAvatar();
+                console.log('✅ Avatar humain initialisé');
+            }
+
+            // Avatar SVG
+            if (typeof FluidSVGAvatar !== 'undefined') {
+                svgAvatar = new FluidSVGAvatar();
+                svgAvatar.generateSVGAvatar('test', 'svgAvatarContainer');
+                console.log('✅ Avatar SVG initialisé');
+            }
+        }
+
+        function injectClassicAvatar() {
+            const container = document.getElementById('classicAvatarContainer');
+            container.innerHTML = `
+                <div id="testClassicAvatar" class="exercise-avatar medium">
+                    <div class="avatar-body">
+                        <div class="avatar-head">
+                            <span id="testClassicFace">😊</span>
+                        </div>
+                        <div class="avatar-arms">
+                            <div class="arm-left"></div>
+                            <div class="arm-right"></div>
+                        </div>
+                        <div class="avatar-torso"></div>
+                        <div class="avatar-legs">
+                            <div class="leg-left"></div>
+                            <div class="leg-right"></div>
+                        </div>
+                    </div>
+                    <div class="breathing-indicator" id="testBreathingIndicator"></div>
+                </div>
+                <div id="testClassicInstruction" class="text-center mt-3">
+                    Avatar classique prêt !
+                </div>
+            `;
+        }
+
+        function injectHumanAvatar() {
+            const container = document.getElementById('humanAvatarContainer');
+            container.innerHTML = humanAvatar.generateHumanAvatarHTML('test');
+            humanAvatar.applyUserStyling('testHumanAvatar');
+        }
+
+        // Fonctions de test pour l'avatar classique
+        function testClassicBreathing() {
+            if (classicAvatar) {
+                classicAvatar.currentExercise = 'breathing';
+                classicAvatar.isAnimating = true;
+                simulateClassicBreathing();
+            }
+        }
+
+        function testClassicStretching() {
+            if (classicAvatar) {
+                classicAvatar.currentExercise = 'stretching';
+                classicAvatar.isAnimating = true;
+                simulateClassicStretching();
+            }
+        }
+
+        function testClassicMotivation() {
+            if (classicAvatar) {
+                classicAvatar.currentExercise = 'motivation';
+                classicAvatar.isAnimating = true;
+                simulateClassicMotivation();
+            }
+        }
+
+        function stopClassicExercise() {
+            if (classicAvatar) {
+                classicAvatar.isAnimating = false;
+                const avatar = document.getElementById('testClassicAvatar');
+                const face = document.getElementById('testClassicFace');
+                const instruction = document.getElementById('testClassicInstruction');
+                
+                if (avatar) avatar.className = 'exercise-avatar medium';
+                if (face) face.textContent = '😊';
+                if (instruction) instruction.textContent = 'Avatar classique arrêté';
+            }
+        }
+
+        // Fonctions de test pour l'avatar humain
+        function testHumanBreathing() {
+            if (humanAvatar) {
+                humanAvatar.startExercise('breathing');
+            }
+        }
+
+        function testHumanStretching() {
+            if (humanAvatar) {
+                humanAvatar.startExercise('stretching');
+            }
+        }
+
+        function testHumanMotivation() {
+            if (humanAvatar) {
+                humanAvatar.startExercise('motivation');
+            }
+        }
+
+        function stopHumanExercise() {
+            if (humanAvatar) {
+                humanAvatar.stopExercise();
+            }
+        }
+
+        // Fonctions de test pour l'avatar SVG
+        function testSVGBreathing() {
+            if (svgAvatar) {
+                svgAvatar.startFluidAnimation('test', 'deep_inhale');
+                setTimeout(() => svgAvatar.startFluidAnimation('test', 'breath_hold'), 4000);
+                setTimeout(() => svgAvatar.startFluidAnimation('test', 'slow_exhale'), 8000);
+            }
+        }
+
+        function testSVGStretching() {
+            if (svgAvatar) {
+                svgAvatar.startFluidAnimation('test', 'neck_stretch_sequence');
+                setTimeout(() => svgAvatar.startFluidAnimation('test', 'shoulder_roll_sequence'), 3000);
+                setTimeout(() => svgAvatar.startFluidAnimation('test', 'arm_stretch_sequence'), 6000);
+            }
+        }
+
+        function testSVGMotivation() {
+            if (svgAvatar) {
+                svgAvatar.startFluidAnimation('test', 'confidence_boost');
+            }
+        }
+
+        function stopSVGExercise() {
+            if (svgAvatar) {
+                svgAvatar.stopFluidAnimation();
+            }
+        }
+
+        // Fonctions de simulation pour l'avatar classique
+        function simulateClassicBreathing() {
+            const avatar = document.getElementById('testClassicAvatar');
+            const face = document.getElementById('testClassicFace');
+            const instruction = document.getElementById('testClassicInstruction');
+            
+            let step = 0;
+            const breathingSteps = [
+                { class: 'breathing-in', face: '😌', text: 'Inspirez profondément...' },
+                { class: 'breathing-hold', face: '😶', text: 'Retenez votre respiration...' },
+                { class: 'breathing-out', face: '😮‍💨', text: 'Expirez lentement...' },
+                { class: 'breathing-pause', face: '😊', text: 'Pause et détente...' }
+            ];
+            
+            function nextBreathingStep() {
+                if (!classicAvatar.isAnimating) return;
+                
+                const currentStep = breathingSteps[step % breathingSteps.length];
+                avatar.className = `exercise-avatar medium ${currentStep.class}`;
+                face.textContent = currentStep.face;
+                instruction.textContent = currentStep.text;
+                
+                step++;
+                setTimeout(nextBreathingStep, 3000);
+            }
+            
+            nextBreathingStep();
+        }
+
+        function simulateClassicStretching() {
+            const avatar = document.getElementById('testClassicAvatar');
+            const face = document.getElementById('testClassicFace');
+            const instruction = document.getElementById('testClassicInstruction');
+            
+            let step = 0;
+            const stretchingSteps = [
+                { class: 'neck-roll', face: '🙃', text: 'Roulement de cou...' },
+                { class: 'shoulder-shrug', face: '💪', text: 'Haussement d\'épaules...' },
+                { class: 'back-twist', face: '🌀', text: 'Rotation du buste...' },
+                { class: 'ankle-rotation', face: '🦶', text: 'Rotation des chevilles...' }
+            ];
+            
+            function nextStretchingStep() {
+                if (!classicAvatar.isAnimating) return;
+                
+                const currentStep = stretchingSteps[step % stretchingSteps.length];
+                avatar.className = `exercise-avatar medium ${currentStep.class}`;
+                face.textContent = currentStep.face;
+                instruction.textContent = currentStep.text;
+                
+                step++;
+                setTimeout(nextStretchingStep, 4000);
+            }
+            
+            nextStretchingStep();
+        }
+
+        function simulateClassicMotivation() {
+            const avatar = document.getElementById('testClassicAvatar');
+            const face = document.getElementById('testClassicFace');
+            const instruction = document.getElementById('testClassicInstruction');
+            
+            let step = 0;
+            const motivationSteps = [
+                { class: 'celebrate', face: '🎉', text: 'Vous êtes formidable !' },
+                { class: 'confident-pose', face: '😎', text: 'Confiance en soi !' },
+                { class: 'victory', face: '🏆', text: 'Victoire assurée !' }
+            ];
+            
+            function nextMotivationStep() {
+                if (!classicAvatar.isAnimating) return;
+                
+                const currentStep = motivationSteps[step % motivationSteps.length];
+                avatar.className = `exercise-avatar medium ${currentStep.class}`;
+                face.textContent = currentStep.face;
+                instruction.textContent = currentStep.text;
+                
+                step++;
+                setTimeout(nextMotivationStep, 2000);
+            }
+            
+            nextMotivationStep();
+        }
+
+        // Contrôles globaux
+        function startAllBreathing() {
+            testClassicBreathing();
+            testHumanBreathing();
+            testSVGBreathing();
+        }
+
+        function startAllStretching() {
+            testClassicStretching();
+            testHumanStretching();
+            testSVGStretching();
+        }
+
+        function stopAllExercises() {
+            stopClassicExercise();
+            stopHumanExercise();
+            stopSVGExercise();
+        }
+    </script>
+</body>
+</html>

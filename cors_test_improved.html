@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsyBot CORS Test Improved</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-panel {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .result-panel {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            max-height: 300px;
+            overflow: auto;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .info-box {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        pre {
+            white-space: pre-wrap;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+        .details {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>PsyBot CORS Test Tool (Improved)</h1>
+    
+    <div class="info-box">
+        <h3>About This Tool</h3>
+        <p>This tool helps diagnose CORS (Cross-Origin Resource Sharing) issues when accessing PHP files from the Flask development server.</p>
+        <p>Current Origin: <span id="currentOrigin"></span></p>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test CORS with save_avatar.php</h2>
+        <p>Tests if avatar saving works properly with CORS configured correctly</p>
+        <button id="testSaveAvatar">Test Save Avatar</button>
+        <div id="saveAvatarResult" class="result-panel">Results will appear here...</div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test CORS with load_avatar.php</h2>
+        <p>Tests if avatar loading works properly with CORS configured correctly</p>
+        <button id="testLoadAvatar">Test Load Avatar</button>
+        <div id="loadAvatarResult" class="result-panel">Results will appear here...</div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Test Headers with OPTIONS Request (Preflight)</h2>
+        <p>Tests if the server properly responds to CORS preflight requests</p>
+        <button id="testPreflightRequest">Test Preflight Request</button>
+        <div id="preflightResult" class="result-panel">Results will appear here...</div>
+    </div>
+    
+    <div class="test-panel">
+        <h2>Server Information</h2>
+        <button id="getServerInfo">Get Server Info</button>
+        <div id="serverInfoResult" class="result-panel">Results will appear here...</div>
+    </div>
+
+    <script>
+        // Display current origin
+        document.getElementById('currentOrigin').textContent = window.location.origin;
+        
+        // Dummy avatar data for testing
+        const dummyAvatarData = {
+            avatar_config: {
+                name: "TestUser",
+                emoji: "🧪",
+                skinColor: "medium",
+                gender: "neutral",
+                hair: {
+                    style: "medium",
+                    color: "#4E342E"
+                },
+                accessories: "glasses",
+                outfit: {
+                    style: "casual",
+                    color: "#3F51B5"
+                },
+                preferences: {
+                    breathing: true,
+                    stretch: true,
+                    motivation: true
+                }
+            },
+            avatar_image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=="
+        };
+        
+        // Helper function to display results
+        function displayResult(elementId, data, isSuccess) {
+            const resultElement = document.getElementById(elementId);
+            let resultHTML = '';
+            
+            if (isSuccess) {
+                resultHTML += '<div class="success">✅ Test Succeeded</div>';
+            } else {
+                resultHTML += '<div class="error">❌ Test Failed</div>';
+            }
+            
+            // Add details
+            if (typeof data === 'object') {
+                resultHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } else {
+                resultHTML += '<pre>' + data + '</pre>';
+            }
+            
+            // Add current timestamp
+            resultHTML += '<div class="details">Test performed at: ' + new Date().toLocaleTimeString() + '</div>';
+            
+            resultElement.innerHTML = resultHTML;
+        }
+        
+        // Test save avatar
+        document.getElementById('testSaveAvatar').addEventListener('click', function() {
+            const resultElement = document.getElementById('saveAvatarResult');
+            resultElement.innerHTML = 'Testing...';
+            
+            // Determine the save path
+            const isDevServer = window.location.origin.includes(':5000');
+            const savePath = isDevServer ? 'http://localhost/psybot/save_avatar.php' : '/save_avatar.php';
+            
+            fetch(savePath, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dummyAvatarData),
+                mode: 'cors',
+                credentials: 'omit'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayResult('saveAvatarResult', data, true);
+            })
+            .catch(error => {
+                displayResult('saveAvatarResult', {
+                    error: error.message,
+                    details: 'This might be a CORS issue. Make sure save_avatar.php has proper CORS headers.',
+                    tips: [
+                        '1. Check that XAMPP Apache server is running',
+                        '2. Verify CORS headers in save_avatar.php',
+                        '3. Check browser console for specific error messages'
+                    ]
+                }, false);
+            });
+        });
+        
+        // Test load avatar
+        document.getElementById('testLoadAvatar').addEventListener('click', function() {
+            const resultElement = document.getElementById('loadAvatarResult');
+            resultElement.innerHTML = 'Testing...';
+            
+            // Determine the load path
+            const isDevServer = window.location.origin.includes(':5000');
+            const loadPath = isDevServer ? 'http://localhost/psybot/load_avatar.php' : '/load_avatar.php';
+            
+            fetch(loadPath, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                mode: 'cors',
+                credentials: 'omit'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayResult('loadAvatarResult', data, true);
+            })
+            .catch(error => {
+                displayResult('loadAvatarResult', {
+                    error: error.message,
+                    details: 'This might be a CORS issue. Make sure load_avatar.php has proper CORS headers.',
+                    tips: [
+                        '1. Check that XAMPP Apache server is running',
+                        '2. Verify CORS headers in load_avatar.php',
+                        '3. Check browser console for specific error messages'
+                    ]
+                }, false);
+            });
+        });
+        
+        // Test preflight request
+        document.getElementById('testPreflightRequest').addEventListener('click', function() {
+            const resultElement = document.getElementById('preflightResult');
+            resultElement.innerHTML = 'Testing...';
+            
+            // Create a custom XHR to examine headers
+            const xhr = new XMLHttpRequest();
+            const isDevServer = window.location.origin.includes(':5000');
+            const savePath = isDevServer ? 'http://localhost/psybot/save_avatar.php' : '/save_avatar.php';
+            
+            xhr.open('OPTIONS', savePath);
+            xhr.setRequestHeader('Access-Control-Request-Method', 'POST');
+            xhr.setRequestHeader('Access-Control-Request-Headers', 'content-type');
+            
+            xhr.onload = function() {
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': xhr.getResponseHeader('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': xhr.getResponseHeader('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': xhr.getResponseHeader('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': xhr.getResponseHeader('Access-Control-Allow-Credentials'),
+                    'Access-Control-Max-Age': xhr.getResponseHeader('Access-Control-Max-Age')
+                };
+                
+                const allowOrigin = xhr.getResponseHeader('Access-Control-Allow-Origin');
+                const allowMethods = xhr.getResponseHeader('Access-Control-Allow-Methods');
+                
+                if (allowOrigin && allowMethods) {
+                    displayResult('preflightResult', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        corsHeaders: corsHeaders
+                    }, true);
+                } else {
+                    displayResult('preflightResult', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        corsHeaders: corsHeaders,
+                        error: 'Missing required CORS headers',
+                        tips: [
+                            'The server should respond with Access-Control-Allow-Origin and Access-Control-Allow-Methods headers'
+                        ]
+                    }, false);
+                }
+            };
+            
+            xhr.onerror = function() {
+                displayResult('preflightResult', {
+                    error: 'Network error occurred',
+                    details: 'Could not complete the OPTIONS request. This could be due to the server being down or not supporting CORS preflight requests.'
+                }, false);
+            };
+            
+            xhr.send();
+        });
+        
+        // Get server information
+        document.getElementById('getServerInfo').addEventListener('click', function() {
+            const resultElement = document.getElementById('serverInfoResult');
+            resultElement.innerHTML = 'Gathering information...';
+            
+            // Collect client-side information
+            const serverInfo = {
+                client: {
+                    userAgent: navigator.userAgent,
+                    origin: window.location.origin,
+                    host: window.location.host,
+                    protocol: window.location.protocol,
+                    isDevServer: window.location.origin.includes(':5000')
+                },
+                xamppServerStatus: 'Checking...',
+                flaskServerStatus: 'Checking...'
+            };
+            
+            // Check Flask server
+            fetch('http://localhost:5000/wellness-tip', { mode: 'no-cors' })
+            .then(() => {
+                serverInfo.flaskServerStatus = 'Running';
+                checkXampp();
+            })
+            .catch(() => {
+                serverInfo.flaskServerStatus = 'Not running or not accessible';
+                checkXampp();
+            });
+            
+            // Check XAMPP server
+            function checkXampp() {
+                fetch('http://localhost/psybot/cors_diagnostic.php', { mode: 'no-cors' })
+                .then(() => {
+                    serverInfo.xamppServerStatus = 'Running';
+                    showResults();
+                })
+                .catch(() => {
+                    serverInfo.xamppServerStatus = 'Not running or not accessible';
+                    showResults();
+                });
+            }
+            
+            function showResults() {
+                displayResult('serverInfoResult', serverInfo, true);
+            }
+        });
+    </script>
+</body>
+</html>

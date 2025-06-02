@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Avatar System Demo - PsyBot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .avatar-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .avatar-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .avatar-display {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 20px auto;
+            border: 5px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-display:hover {
+            transform: scale(1.05);
+            border-color: #007bff;
+        }
+        
+        .avatar-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .provider-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .provider-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .provider-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .provider-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .demo-controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-loading { background: #ffc107; }
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        
+        .comparison-table {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            overflow-x: auto;
+        }
+        
+        .btn-demo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn-demo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+        
+        .migration-status {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .avatar-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1><i class="fas fa-robot"></i> External Avatar System Demo</h1>
+            <p class="lead">Découvrez le nouveau système d'avatar utilisant Avataaars, DiceBear et Ready Player Me</p>
+            <div class="badge bg-success">Nouvelle Génération d'Avatars</div>
+        </div>
+
+        <!-- Migration Status -->
+        <div class="migration-status">
+            <h5><i class="fas fa-sync-alt"></i> Statut de Migration</h5>
+            <div id="migrationStatus">
+                <span class="status-indicator status-loading"></span>
+                Vérification du système...
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm" onclick="startMigration()">
+                    <i class="fas fa-play"></i> Démarrer la Migration
+                </button>
+                <button class="btn btn-warning btn-sm" onclick="rollbackMigration()">
+                    <i class="fas fa-undo"></i> Annuler Migration
+                </button>
+            </div>
+        </div>
+
+        <!-- Avatar Comparison -->
+        <div class="avatar-comparison">
+            <div class="avatar-section">
+                <h4><i class="fas fa-user-circle"></i> Ancien Système</h4>
+                <div class="avatar-display" id="oldAvatarDisplay">
+                    🧘‍♀️
+                </div>
+                <p class="text-center">Système d'avatar emoji basique</p>
+                <ul class="list-unstyled">
+                    <li>❌ Options limitées</li>
+                    <li>❌ Pas de personnalisation avancée</li>
+                    <li>❌ Performance limitée</li>
+                    <li>❌ Maintien complexe</li>
+                </ul>
+            </div>
+            
+            <div class="avatar-section">
+                <h4><i class="fas fa-sparkles"></i> Nouveau Système</h4>
+                <div class="avatar-display" id="newAvatarDisplay">
+                    <img src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShortWaved&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=Hoodie&clotheColor=Blue03&eyeType=Happy&eyebrowType=Default&mouthType=Smile&skinColor=Light" alt="New Avatar" />
+                </div>
+                <p class="text-center">Avatar généré par API externe</p>
+                <ul class="list-unstyled">
+                    <li>✅ Nombreuses options</li>
+                    <li>✅ Personnalisation complète</li>
+                    <li>✅ Performance optimisée</li>
+                    <li>✅ Maintien simplifié</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Provider Showcase -->
+        <div class="provider-showcase">
+            <div class="provider-card">
+                <div class="provider-logo">😊</div>
+                <h5>Avataaars</h5>
+                <p>Avatars style croquis avec de nombreuses options de personnalisation</p>
+                <div class="avatar-display" style="width: 120px; height: 120px;">
+                    <img id="avataaarsPreview" src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&clotheColor=Blue03&eyeType=Happy&eyebrowType=Default&mouthType=Smile&skinColor=Light" alt="Avataaars" />
+                </div>
+                <button class="btn-demo" onclick="switchProvider('avataaars')">
+                    Essayer Avataaars
+                </button>
+            </div>
+            
+            <div class="provider-card">
+                <div class="provider-logo">🎲</div>
+                <h5>DiceBear</h5>
+                <p>Bibliothèque d'avatars SVG avec plusieurs styles disponibles</p>
+                <div class="avatar-display" style="width: 120px; height: 120px;">
+                    <img id="dicebearPreview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=demo&backgroundColor=transparent" alt="DiceBear" />
+                </div>
+                <button class="btn-demo" onclick="switchProvider('dicebear')">
+                    Essayer DiceBear
+                </button>
+            </div>
+            
+            <div class="provider-card">
+                <div class="provider-logo">🕺</div>
+                <h5>Ready Player Me</h5>
+                <p>Avatars 3D pour applications métaverse et jeux</p>
+                <div class="avatar-display" style="width: 120px; height: 120px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                        3D
+                    </div>
+                </div>
+                <button class="btn-demo" onclick="switchProvider('readyplayerme')">
+                    Essayer Ready Player Me
+                </button>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <h5>Performance</h5>
+                <p>Chargement plus rapide avec des avatars optimisés et mise en cache</p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🎨</span>
+                <h5>Personnalisation</h5>
+                <p>Des milliers de combinaisons possibles pour un avatar unique</p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🔧</span>
+                <h5>Maintenance</h5>
+                <p>Code simplifié et utilisation d'APIs professionnelles</p>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🌐</span>
+                <h5>Évolutivité</h5>
+                <p>Facilité d'ajout de nouveaux fournisseurs d'avatars</p>
+            </div>
+        </div>
+
+        <!-- Demo Controls -->
+        <div class="demo-controls">
+            <h4><i class="fas fa-gamepad"></i> Contrôles de Démonstration</h4>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Actions sur l'Avatar</h6>
+                    <button class="btn-demo" onclick="randomizeAvatar()">
+                        <i class="fas fa-random"></i> Avatar Aléatoire
+                    </button>
+                    <button class="btn-demo" onclick="exportAvatar()">
+                        <i class="fas fa-download"></i> Exporter Avatar
+                    </button>
+                    <button class="btn-demo" onclick="openCustomization()">
+                        <i class="fas fa-cog"></i> Personnaliser
+                    </button>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6>Tests d'Intégration</h6>
+                    <button class="btn-demo" onclick="testBreathingExercise()">
+                        <i class="fas fa-wind"></i> Test Respiration
+                    </button>
+                    <button class="btn-demo" onclick="testStretchingExercise()">
+                        <i class="fas fa-user-ninja"></i> Test Étirement
+                    </button>
+                    <button class="btn-demo" onclick="testMotivation()">
+                        <i class="fas fa-heart"></i> Test Motivation
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="comparison-table">
+            <h4><i class="fas fa-chart-bar"></i> Comparaison des Systèmes</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Fonctionnalité</th>
+                        <th>Ancien Système</th>
+                        <th>Nouveau Système</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Options de personnalisation</td>
+                        <td><span class="badge bg-warning">Limitées</span></td>
+                        <td><span class="badge bg-success">Nombreuses</span></td>
+                    </tr>
+                    <tr>
+                        <td>Qualité visuelle</td>
+                        <td><span class="badge bg-warning">Emojis</span></td>
+                        <td><span class="badge bg-success">Professionnelle</span></td>
+                    </tr>
+                    <tr>
+                        <td>Performance</td>
+                        <td><span class="badge bg-danger">Lente</span></td>
+                        <td><span class="badge bg-success">Rapide</span></td>
+                    </tr>
+                    <tr>
+                        <td>Maintenance du code</td>
+                        <td><span class="badge bg-danger">Complexe</span></td>
+                        <td><span class="badge bg-success">Simple</span></td>
+                    </tr>
+                    <tr>
+                        <td>Évolutivité</td>
+                        <td><span class="badge bg-warning">Limitée</span></td>
+                        <td><span class="badge bg-success">Excellente</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- System Status -->
+        <div class="demo-controls">
+            <h4><i class="fas fa-info-circle"></i> Statut du Système</h4>
+            <div id="systemStatus">
+                <div class="mb-2">
+                    <span class="status-indicator status-loading"></span>
+                    <strong>Système Externe:</strong> <span id="externalSystemStatus">Initialisation...</span>
+                </div>
+                <div class="mb-2">
+                    <span class="status-indicator status-loading"></span>
+                    <strong>Migration:</strong> <span id="migrationSystemStatus">En attente...</span>
+                </div>
+                <div class="mb-2">
+                    <span class="status-indicator status-loading"></span>
+                    <strong>Exercices:</strong> <span id="exerciseIntegrationStatus">Vérification...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Test Modal -->
+    <div class="modal fade" id="exerciseTestModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Test d'Intégration Exercice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <div class="avatar-display" id="exerciseAvatarDisplay" style="width: 150px; height: 150px;">
+                            <!-- Avatar will be loaded here -->
+                        </div>
+                        <h6 id="exerciseTitle">Test d'Exercice</h6>
+                        <p id="exerciseDescription">Description de l'exercice...</p>
+                        <div id="exerciseControls">
+                            <!-- Exercise-specific controls -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/external-avatar-system.js"></script>
+    <script src="../static/js/avatar-migration-manager.js"></script>
+    
+    <script>
+        // Demo-specific JavaScript
+        let currentProvider = 'avataaars';
+        let externalSystem = null;
+        let migrationManager = null;
+        
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 External Avatar Demo initializing...');
+            
+            // Wait a bit for systems to load
+            setTimeout(() => {
+                initializeSystems();
+                updateSystemStatus();
+                setupDemoListeners();
+            }, 1000);
+        });
+        
+        function initializeSystems() {
+            try {
+                // Initialize external avatar system
+                if (window.ExternalAvatarSystem) {
+                    externalSystem = new ExternalAvatarSystem();
+                    updateStatusIndicator('externalSystemStatus', 'Actif', 'success');
+                } else {
+                    updateStatusIndicator('externalSystemStatus', 'Erreur de chargement', 'error');
+                }
+                
+                // Initialize migration manager
+                if (window.avatarMigrationManager) {
+                    migrationManager = window.avatarMigrationManager;
+                    updateStatusIndicator('migrationSystemStatus', 'Prêt', 'success');
+                } else {
+                    updateStatusIndicator('migrationSystemStatus', 'Non disponible', 'error');
+                }
+                
+                updateStatusIndicator('exerciseIntegrationStatus', 'Disponible', 'success');
+                
+            } catch (error) {
+                console.error('Erreur d\'initialisation:', error);
+                updateStatusIndicator('externalSystemStatus', 'Erreur', 'error');
+            }
+        }
+        
+        function updateStatusIndicator(elementId, status, type) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = status;
+                const indicator = element.parentElement.querySelector('.status-indicator');
+                if (indicator) {
+                    indicator.className = `status-indicator status-${type}`;
+                }
+            }
+        }
+        
+        function updateSystemStatus() {
+            const migrationStatus = localStorage.getItem('psybot_migration_status');
+            const statusElement = document.getElementById('migrationStatus');
+            
+            if (migrationStatus) {
+                const status = JSON.parse(migrationStatus);
+                if (status.completed) {
+                    statusElement.innerHTML = `
+                        <span class="status-indicator status-success"></span>
+                        Migration terminée avec succès! Étape ${status.currentStep}/6
+                    `;
+                } else if (status.currentStep > 0) {
+                    statusElement.innerHTML = `
+                        <span class="status-indicator status-loading"></span>
+                        Migration en cours... Étape ${status.currentStep}/6
+                    `;
+                } else {
+                    statusElement.innerHTML = `
+                        <span class="status-indicator status-loading"></span>
+                        Migration non démarrée
+                    `;
+                }
+            }
+        }
+        
+        function setupDemoListeners() {
+            console.log('📡 Setting up demo listeners...');
+        }
+        
+        // Demo Functions
+        function switchProvider(provider) {
+            console.log(`🔄 Switching to ${provider}...`);
+            currentProvider = provider;
+            
+            if (externalSystem) {
+                externalSystem.switchProvider(provider);
+                updateAvatarDisplay();
+            }
+            
+            // Update provider buttons
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('border-primary');
+            });
+            
+            event.target.closest('.provider-card').classList.add('border-primary');
+        }
+        
+        function randomizeAvatar() {
+            console.log('🎲 Randomizing avatar...');
+            if (externalSystem) {
+                externalSystem.randomizeAvatar();
+                updateAvatarDisplay();
+            }
+        }
+        
+        function updateAvatarDisplay() {
+            if (externalSystem) {
+                const newAvatarUrl = externalSystem.generateAvatarUrl();
+                const newDisplay = document.getElementById('newAvatarDisplay');
+                const img = newDisplay.querySelector('img') || document.createElement('img');
+                img.src = newAvatarUrl;
+                img.alt = 'New Avatar';
+                if (!newDisplay.querySelector('img')) {
+                    newDisplay.appendChild(img);
+                }
+            }
+        }
+        
+        async function exportAvatar() {
+            console.log('📥 Exporting avatar...');
+            if (externalSystem) {
+                const dataUrl = await externalSystem.exportAsDataUrl();
+                if (dataUrl) {
+                    const link = document.createElement('a');
+                    link.download = 'my-avatar.png';
+                    link.href = dataUrl;
+                    link.click();
+                } else {
+                    alert('Erreur lors de l\'export de l\'avatar');
+                }
+            }
+        }
+        
+        function openCustomization() {
+            console.log('⚙️ Opening customization...');
+            if (externalSystem) {
+                const ui = externalSystem.createSimpleCustomizationUI();
+                
+                // Show in modal or sidebar
+                const modal = new bootstrap.Modal(document.getElementById('exerciseTestModal'));
+                const modalBody = document.querySelector('#exerciseTestModal .modal-body');
+                modalBody.innerHTML = '';
+                modalBody.appendChild(ui);
+                
+                document.querySelector('#exerciseTestModal .modal-title').textContent = 'Personnalisation Avatar';
+                modal.show();
+            }
+        }
+        
+        function testBreathingExercise() {
+            console.log('🌬️ Testing breathing exercise...');
+            showExerciseTest('breathing', 'Exercice de Respiration', 'Avatar adapté pour l\'exercice de respiration avec animation douce');
+        }
+        
+        function testStretchingExercise() {
+            console.log('🤸 Testing stretching exercise...');
+            showExerciseTest('stretching', 'Exercice d\'Étirement', 'Avatar configuré pour guider les mouvements d\'étirement');
+        }
+        
+        function testMotivation() {
+            console.log('💪 Testing motivation...');
+            showExerciseTest('motivation', 'Message Motivant', 'Avatar optimisé pour transmettre de l\'encouragement et de la motivation');
+        }
+        
+        function showExerciseTest(type, title, description) {
+            if (!externalSystem) return;
+            
+            const avatarUrl = externalSystem.getAvatarForExercise(type);
+            const modal = new bootstrap.Modal(document.getElementById('exerciseTestModal'));
+            
+            document.querySelector('#exerciseTestModal .modal-title').textContent = title;
+            document.getElementById('exerciseTitle').textContent = title;
+            document.getElementById('exerciseDescription').textContent = description;
+            
+            const avatarDisplay = document.getElementById('exerciseAvatarDisplay');
+            avatarDisplay.innerHTML = `<img src="${avatarUrl}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            
+            // Add exercise-specific controls
+            const controls = document.getElementById('exerciseControls');
+            controls.innerHTML = `
+                <button class="btn btn-primary" onclick="startExerciseDemo('${type}')">
+                    <i class="fas fa-play"></i> Démarrer ${title}
+                </button>
+                <button class="btn btn-secondary" onclick="randomizeExerciseAvatar('${type}')">
+                    <i class="fas fa-random"></i> Changer Avatar
+                </button>
+            `;
+            
+            modal.show();
+        }
+        
+        function startExerciseDemo(type) {
+            console.log(`▶️ Starting ${type} exercise demo...`);
+            // Simulate exercise start
+            alert(`Exercice ${type} démarré avec le nouvel avatar!`);
+        }
+        
+        function randomizeExerciseAvatar(type) {
+            if (externalSystem) {
+                externalSystem.randomizeAvatar();
+                const avatarUrl = externalSystem.getAvatarForExercise(type);
+                const avatarDisplay = document.getElementById('exerciseAvatarDisplay');
+                const img = avatarDisplay.querySelector('img');
+                if (img) {
+                    img.src = avatarUrl;
+                }
+            }
+        }
+        
+        function startMigration() {
+            console.log('🚀 Starting migration...');
+            if (migrationManager) {
+                migrationManager.runMigration().then(success => {
+                    if (success) {
+                        updateSystemStatus();
+                        alert('Migration terminée avec succès! 🎉');
+                    } else {
+                        alert('Erreur lors de la migration. Consultez la console pour plus de détails.');
+                    }
+                });
+            } else {
+                alert('Manager de migration non disponible.');
+            }
+        }
+        
+        function rollbackMigration() {
+            console.log('⏮️ Rolling back migration...');
+            if (migrationManager) {
+                if (confirm('Êtes-vous sûr de vouloir annuler la migration? Cette action rechargera la page.')) {
+                    migrationManager.rollbackMigration();
+                }
+            } else {
+                alert('Manager de migration non disponible.');
+            }
+        }
+    </script>
+</body>
+</html>

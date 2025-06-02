@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Avatar Animé pour Exercices de Bien-être</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/avatar-exercise-animations.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .exercise-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .exercise-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .exercise-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .exercise-card h4 {
+            margin-bottom: 10px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .status-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .breathing { background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%); }
+        .stretching { background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%); }
+        .motivation { background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%); }
+        
+        .log-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .avatar-config-panel {
+            background: #f1f3f4;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .config-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .config-group h6 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .face-option, .size-option, .color-option {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 5px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .face-option:hover, .size-option:hover, .color-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .face-option.selected, .size-option.selected, .color-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1><i class="fas fa-robot"></i> Test Avatar Animé - Exercices de Bien-être</h1>
+            <p class="lead">Testez les animations d'avatar intelligentes pour les exercices de respiration, étirements et motivation</p>
+        </div>
+        
+        <!-- Configuration Avatar -->
+        <div class="avatar-config-panel">
+            <h5><i class="fas fa-cog"></i> Configuration de l'Avatar</h5>
+            <div class="config-options">
+                <div class="config-group">
+                    <h6>Expression</h6>
+                    <div class="face-options">
+                        <span class="face-option selected" data-face="😊">😊</span>
+                        <span class="face-option" data-face="😌">😌</span>
+                        <span class="face-option" data-face="🙂">🙂</span>
+                        <span class="face-option" data-face="😎">😎</span>
+                        <span class="face-option" data-face="🤗">🤗</span>
+                    </div>
+                </div>
+                <div class="config-group">
+                    <h6>Taille</h6>
+                    <div class="size-options">
+                        <span class="size-option" data-size="small">Petit</span>
+                        <span class="size-option selected" data-size="medium">Moyen</span>
+                        <span class="size-option" data-size="large">Grand</span>
+                    </div>
+                </div>
+                <div class="config-group">
+                    <h6>Couleur</h6>
+                    <div class="color-options">
+                        <span class="color-option selected" data-color="#4fc3f7" style="background: #4fc3f7;"></span>
+                        <span class="color-option" data-color="#81c784" style="background: #81c784;"></span>
+                        <span class="color-option" data-color="#ffb74d" style="background: #ffb74d;"></span>
+                        <span class="color-option" data-color="#f06292" style="background: #f06292;"></span>
+                        <span class="color-option" data-color="#ba68c8" style="background: #ba68c8;"></span>
+                    </div>
+                </div>
+            </div>
+            <button id="saveAvatarConfig" class="btn btn-primary mt-3">
+                <i class="fas fa-save"></i> Sauvegarder Configuration
+            </button>
+        </div>
+        
+        <!-- Cartes d'Exercices -->
+        <div class="exercise-cards">
+            <div class="exercise-card breathing" id="breathingExercise">
+                <i class="fas fa-lungs"></i>
+                <h4>Respiration Guidée</h4>
+                <p>4 minutes d'exercices de respiration avec animation avatar</p>
+                <small>Inspirez, retenez, expirez avec votre avatar</small>
+            </div>
+            
+            <div class="exercise-card stretching" id="stretchingExercise">
+                <i class="fas fa-child"></i>
+                <h4>Étirements de Bureau</h4>
+                <p>3 minutes d'étirements animés par l'avatar</p>
+                <small>Mouvements du cou, épaules, poignets et dos</small>
+            </div>
+            
+            <div class="exercise-card motivation" id="motivationExercise">
+                <i class="fas fa-star"></i>
+                <h4>Motivation Positive</h4>
+                <p>1 minute d'animations motivantes</p>
+                <small>Célébration, confiance et positivité</small>
+            </div>
+        </div>
+        
+        <!-- Contrôles de Test -->
+        <div class="test-controls">
+            <button id="testBreathing" class="btn btn-info">
+                <i class="fas fa-play"></i> Test Respiration
+            </button>
+            <button id="testStretching" class="btn btn-success">
+                <i class="fas fa-play"></i> Test Étirements
+            </button>
+            <button id="testMotivation" class="btn btn-warning">
+                <i class="fas fa-play"></i> Test Motivation
+            </button>
+            <button id="stopAllExercises" class="btn btn-danger">
+                <i class="fas fa-stop"></i> Arrêter Tout
+            </button>
+        </div>
+        
+        <!-- Panneau de Statut -->
+        <div class="status-panel">
+            <h5><i class="fas fa-info-circle"></i> Statut du Système</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Avatar Guide:</strong> <span id="avatarStatus">Non initialisé</span></p>
+                    <p><strong>Exercice Actuel:</strong> <span id="currentExercise">Aucun</span></p>
+                    <p><strong>Animation:</strong> <span id="animationStatus">Arrêtée</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Configuration Chargée:</strong> <span id="configLoaded">Non</span></p>
+                    <p><strong>Temps Écoulé:</strong> <span id="timeElapsed">0:00</span></p>
+                    <p><strong>Étape Actuelle:</strong> <span id="currentStep">-</span></p>
+                </div>
+            </div>
+            
+            <div class="log-output" id="logOutput">
+                <div>🔄 Initialisation du test...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/static/js/avatar-exercise-guide.js"></script>
+    <script>
+        // Variables globales
+        let testGuide = null;
+        let logElement = null;
+        
+        // Configuration par défaut
+        let currentConfig = {
+            face: '😊',
+            size: 'medium',
+            color: '#4fc3f7',
+            style: 'friendly'
+        };
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            logElement = document.getElementById('logOutput');
+            log('✅ DOM chargé');
+            
+            // Attendre que l'avatar guide soit initialisé
+            setTimeout(() => {
+                if (window.avatarExerciseGuide) {
+                    testGuide = window.avatarExerciseGuide;
+                    log('✅ Avatar Exercise Guide initialisé');
+                    updateStatus('avatarStatus', 'Initialisé');
+                    updateStatus('configLoaded', 'Oui');
+                } else {
+                    log('❌ Erreur: Avatar Exercise Guide non trouvé');
+                    updateStatus('avatarStatus', 'Erreur');
+                }
+                
+                setupEventListeners();
+                loadSavedConfig();
+            }, 1000);
+        });
+        
+        function log(message) {
+            if (logElement) {
+                const time = new Date().toLocaleTimeString();
+                logElement.innerHTML += `<div>[${time}] ${message}</div>`;
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            console.log(message);
+        }
+        
+        function updateStatus(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+        
+        function setupEventListeners() {
+            // Exercices directs
+            document.getElementById('breathingExercise')?.addEventListener('click', () => {
+                startExerciseTest('breathing');
+            });
+            
+            document.getElementById('stretchingExercise')?.addEventListener('click', () => {
+                startExerciseTest('stretching');
+            });
+            
+            document.getElementById('motivationExercise')?.addEventListener('click', () => {
+                startExerciseTest('motivation');
+            });
+            
+            // Boutons de test
+            document.getElementById('testBreathing')?.addEventListener('click', () => {
+                startExerciseTest('breathing');
+            });
+            
+            document.getElementById('testStretching')?.addEventListener('click', () => {
+                startExerciseTest('stretching');
+            });
+            
+            document.getElementById('testMotivation')?.addEventListener('click', () => {
+                startExerciseTest('motivation');
+            });
+            
+            document.getElementById('stopAllExercises')?.addEventListener('click', () => {
+                stopAllExercises();
+            });
+            
+            // Configuration avatar
+            setupAvatarConfigListeners();
+            
+            document.getElementById('saveAvatarConfig')?.addEventListener('click', () => {
+                saveAvatarConfig();
+            });
+        }
+        
+        function setupAvatarConfigListeners() {
+            // Options d'expression
+            document.querySelectorAll('.face-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.face-option').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                    currentConfig.face = e.target.dataset.face;
+                    log(`🎭 Expression changée: ${currentConfig.face}`);
+                });
+            });
+            
+            // Options de taille
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.size-option').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                    currentConfig.size = e.target.dataset.size;
+                    log(`📏 Taille changée: ${currentConfig.size}`);
+                });
+            });
+            
+            // Options de couleur
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    e.target.classList.add('selected');
+                    currentConfig.color = e.target.dataset.color;
+                    log(`🎨 Couleur changée: ${currentConfig.color}`);
+                });
+            });
+        }
+        
+        function startExerciseTest(exerciseType) {
+            if (!testGuide) {
+                log('❌ Erreur: Avatar guide non disponible');
+                return;
+            }
+            
+            log(`🚀 Démarrage exercice: ${exerciseType}`);
+            updateStatus('currentExercise', exerciseType);
+            updateStatus('animationStatus', 'En cours');
+            
+            try {
+                testGuide.startExercise(exerciseType);
+                log(`✅ Exercice ${exerciseType} démarré avec succès`);
+                
+                // Surveiller le progrès
+                monitorExerciseProgress();
+            } catch (error) {
+                log(`❌ Erreur lors du démarrage: ${error.message}`);
+                updateStatus('animationStatus', 'Erreur');
+            }
+        }
+        
+        function stopAllExercises() {
+            if (!testGuide) return;
+            
+            log('🛑 Arrêt de tous les exercices');
+            testGuide.stopExercise();
+            updateStatus('currentExercise', 'Aucun');
+            updateStatus('animationStatus', 'Arrêtée');
+            updateStatus('timeElapsed', '0:00');
+            updateStatus('currentStep', '-');
+        }
+        
+        function monitorExerciseProgress() {
+            const progressInterval = setInterval(() => {
+                if (!testGuide || !testGuide.isAnimating) {
+                    clearInterval(progressInterval);
+                    updateStatus('animationStatus', 'Arrêtée');
+                    return;
+                }
+                
+                // Mettre à jour le temps et l'étape
+                const timeEl = document.getElementById('timeRemaining');
+                if (timeEl) {
+                    updateStatus('timeElapsed', timeEl.textContent);
+                }
+                
+                updateStatus('currentStep', `${testGuide.currentStep + 1}`);
+            }, 1000);
+        }
+        
+        function saveAvatarConfig() {
+            try {
+                localStorage.setItem('userAvatarConfig', JSON.stringify(currentConfig));
+                log('💾 Configuration avatar sauvegardée');
+                
+                // Appliquer la configuration si l'avatar guide est disponible
+                if (testGuide && testGuide.loadUserAvatarConfig) {
+                    testGuide.userAvatarConfig = currentConfig;
+                    testGuide.applyAvatarConfig();
+                    log('🎨 Configuration appliquée à l\'avatar');
+                }
+            } catch (error) {
+                log(`❌ Erreur sauvegarde: ${error.message}`);
+            }
+        }
+        
+        function loadSavedConfig() {
+            try {
+                const saved = localStorage.getItem('userAvatarConfig');
+                if (saved) {
+                    currentConfig = JSON.parse(saved);
+                    log('📁 Configuration chargée depuis le stockage local');
+                    
+                    // Mettre à jour l'interface
+                    updateConfigInterface();
+                }
+            } catch (error) {
+                log(`❌ Erreur chargement config: ${error.message}`);
+            }
+        }
+        
+        function updateConfigInterface() {
+            // Mettre à jour les sélections dans l'interface
+            document.querySelectorAll('.face-option').forEach(option => {
+                option.classList.toggle('selected', option.dataset.face === currentConfig.face);
+            });
+            
+            document.querySelectorAll('.size-option').forEach(option => {
+                option.classList.toggle('selected', option.dataset.size === currentConfig.size);
+            });
+            
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.toggle('selected', option.dataset.color === currentConfig.color);
+            });
+        }
+        
+        // Test automatique au chargement
+        setTimeout(() => {
+            log('🧪 Tests automatiques disponibles');
+            log('🎯 Cliquez sur une carte d\'exercice pour tester');
+            log('⚙️ Configurez l\'avatar puis sauvegardez');
+        }, 2000);
+    </script>
+</body>
+</html>

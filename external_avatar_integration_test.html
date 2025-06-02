@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test d'Intégration des Avatars Externes - PsyBot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .test-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .avatar-preview-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .external-avatar-image {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+        .test-section {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .test-passed {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        .test-failed {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-success {
+            background-color: #28a745;
+        }
+        .status-error {
+            background-color: #dc3545;
+        }
+        .status-warning {
+            background-color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-container">
+            <h1 class="text-center mb-4">
+                <i class="fas fa-cogs"></i> Test d'Intégration des Avatars Externes
+            </h1>
+            
+            <!-- Status Overview -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="test-section" id="statusOverview">
+                        <h3><i class="fas fa-clipboard-check"></i> État du Système</h3>
+                        <div id="systemStatus"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- External Avatar System Test -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="test-section" id="externalAvatarTest">
+                        <h3><i class="fas fa-user-astronaut"></i> Système d'Avatar Externe</h3>
+                        
+                        <div class="mb-3">
+                            <label for="testAvatarProvider" class="form-label">Fournisseur d'Avatar :</label>
+                            <select id="testAvatarProvider" class="form-select">
+                                <option value="avataaars">Avataaars (Style Sketch)</option>
+                                <option value="dicebear">DiceBear (Style Vectoriel)</option>
+                                <option value="readyplayerme">Ready Player Me (Style 3D)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="testAvatarStyle" class="form-label">Style :</label>
+                            <select id="testAvatarStyle" class="form-select">
+                                <option value="circle">Cercle</option>
+                                <option value="square">Carré</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Genre :</label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-secondary" data-test-gender="male">Masculin</button>
+                                <button type="button" class="btn btn-primary" data-test-gender="neutral">Neutre</button>
+                                <button type="button" class="btn btn-outline-secondary" data-test-gender="female">Féminin</button>
+                            </div>
+                        </div>
+                        
+                        <button id="testGenerateAvatar" class="btn btn-info w-100 mb-3">
+                            <i class="fas fa-sync-alt"></i> Tester la Génération d'Avatar
+                        </button>
+                        
+                        <div id="testResults" class="mt-3"></div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="avatar-preview-card">
+                        <h4><i class="fas fa-eye"></i> Aperçu de l'Avatar</h4>
+                        <div id="testAvatarPreview" class="text-center p-3">
+                            <p class="text-muted">L'aperçu de l'avatar apparaîtra ici</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Migration Test -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="test-section" id="migrationTest">
+                        <h3><i class="fas fa-exchange-alt"></i> Test de Migration</h3>
+                        <p>Test de migration d'une configuration d'avatar existante vers le système externe.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h5>Configuration Actuelle :</h5>
+                                <div id="currentConfig" class="p-3 bg-light rounded">
+                                    <p>Chargement...</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button id="testMigration" class="btn btn-warning w-100 mb-3">
+                                    <i class="fas fa-arrow-right"></i> Tester la Migration
+                                </button>
+                                <div id="migrationResults"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <h5>Configuration Migrée :</h5>
+                                <div id="migratedConfig" class="p-3 bg-light rounded">
+                                    <p>Pas encore migré</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integration Test -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="test-section" id="integrationTest">
+                        <h3><i class="fas fa-puzzle-piece"></i> Test d'Intégration</h3>
+                        <p>Test de l'intégration avec l'application principale PsyBot.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button id="testMainAvatar" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-robot"></i> Avatar Principal
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="testBreathingExercise" class="btn btn-success w-100 mb-2">
+                                    <i class="fas fa-lungs"></i> Exercice Respiration
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="testStretchExercise" class="btn btn-info w-100 mb-2">
+                                    <i class="fas fa-dumbbell"></i> Exercice Étirement
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="testMotivationalQuote" class="btn btn-warning w-100 mb-2">
+                                    <i class="fas fa-quote-left"></i> Citation Motivante
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="integrationResults" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include External Avatar System Scripts -->
+    <script src="/static/js/external-avatar-system.js"></script>
+    <script src="/static/js/avatar-migration-manager.js"></script>
+    
+    <script>
+        // Test initialization
+        let testExternalAvatarSystem = null;
+        let testMigrationManager = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Starting External Avatar Integration Tests...');
+            
+            // Initialize test systems
+            initializeTestSystems();
+            
+            // Set up test event listeners
+            setupTestEventListeners();
+            
+            // Run initial status check
+            checkSystemStatus();
+            
+            // Load current configuration for migration test
+            loadCurrentConfiguration();
+        });
+        
+        function initializeTestSystems() {
+            try {
+                if (typeof ExternalAvatarSystem !== 'undefined') {
+                    testExternalAvatarSystem = new ExternalAvatarSystem();
+                    logStatus('External Avatar System initialized', 'success');
+                } else {
+                    logStatus('External Avatar System not found', 'error');
+                }
+                
+                if (typeof AvatarMigrationManager !== 'undefined' && testExternalAvatarSystem) {
+                    testMigrationManager = new AvatarMigrationManager(testExternalAvatarSystem);
+                    logStatus('Migration Manager initialized', 'success');
+                } else {
+                    logStatus('Migration Manager not found or External Avatar System missing', 'error');
+                }
+            } catch (error) {
+                logStatus('Error initializing test systems: ' + error.message, 'error');
+            }
+        }
+        
+        function setupTestEventListeners() {
+            // Provider selection
+            document.getElementById('testAvatarProvider').addEventListener('change', updateTestAvatarStyleOptions);
+            
+            // Generate avatar test
+            document.getElementById('testGenerateAvatar').addEventListener('click', testAvatarGeneration);
+            
+            // Gender selection
+            document.querySelectorAll('[data-test-gender]').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('[data-test-gender]').forEach(b => {
+                        b.classList.remove('btn-primary');
+                        b.classList.add('btn-outline-secondary');
+                    });
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-primary');
+                });
+            });
+            
+            // Migration test
+            document.getElementById('testMigration').addEventListener('click', testMigration);
+            
+            // Integration tests
+            document.getElementById('testMainAvatar').addEventListener('click', () => testIntegration('main'));
+            document.getElementById('testBreathingExercise').addEventListener('click', () => testIntegration('breathing'));
+            document.getElementById('testStretchExercise').addEventListener('click', () => testIntegration('stretch'));
+            document.getElementById('testMotivationalQuote').addEventListener('click', () => testIntegration('motivation'));
+        }
+        
+        function updateTestAvatarStyleOptions() {
+            const provider = document.getElementById('testAvatarProvider').value;
+            const styleSelect = document.getElementById('testAvatarStyle');
+            
+            if (!testExternalAvatarSystem) return;
+            
+            try {
+                const styles = testExternalAvatarSystem.getAvailableStyles(provider);
+                styleSelect.innerHTML = '';
+                
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style.value;
+                    option.textContent = style.name;
+                    styleSelect.appendChild(option);
+                });
+                
+                logStatus(`Updated styles for provider: ${provider}`, 'success');
+            } catch (error) {
+                logStatus('Error updating styles: ' + error.message, 'error');
+            }
+        }
+        
+        function testAvatarGeneration() {
+            if (!testExternalAvatarSystem) {
+                logStatus('External Avatar System not available', 'error');
+                return;
+            }
+            
+            try {
+                const provider = document.getElementById('testAvatarProvider').value;
+                const style = document.getElementById('testAvatarStyle').value;
+                const gender = document.querySelector('[data-test-gender].btn-primary').getAttribute('data-test-gender');
+                
+                const config = {
+                    style: style,
+                    gender: gender
+                };
+                
+                logStatus(`Generating avatar with provider: ${provider}, config: ${JSON.stringify(config)}`, 'info');
+                
+                const avatarUrl = testExternalAvatarSystem.generateAvatar(provider, config);
+                
+                // Display in preview
+                const preview = document.getElementById('testAvatarPreview');
+                preview.innerHTML = `
+                    <img src="${avatarUrl}" alt="Test Avatar" class="external-avatar-image">
+                    <p class="mt-2"><strong>Provider:</strong> ${provider}</p>
+                    <p><strong>URL:</strong> <small>${avatarUrl}</small></p>
+                `;
+                
+                // Log test results
+                const testResults = document.getElementById('testResults');
+                testResults.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check"></i> Test Réussi</h6>
+                        <p><strong>Provider:</strong> ${provider}</p>
+                        <p><strong>Style:</strong> ${style}</p>
+                        <p><strong>Genre:</strong> ${gender}</p>
+                        <p><strong>URL généré:</strong> <small>${avatarUrl}</small></p>
+                    </div>
+                `;
+                
+                logStatus('Avatar generated successfully', 'success');
+                
+            } catch (error) {
+                const testResults = document.getElementById('testResults');
+                testResults.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-times"></i> Test Échoué</h6>
+                        <p><strong>Erreur:</strong> ${error.message}</p>
+                    </div>
+                `;
+                logStatus('Avatar generation failed: ' + error.message, 'error');
+            }
+        }
+        
+        function testMigration() {
+            if (!testMigrationManager) {
+                logStatus('Migration Manager not available', 'error');
+                return;
+            }
+            
+            try {
+                // Test configuration
+                const testConfig = {
+                    emoji: '🧘‍♀️',
+                    name: 'TestBot',
+                    frequency: 'medium',
+                    skinColor: 'medium',
+                    gender: 'neutral',
+                    outfit: { style: 'sport' },
+                    preferences: {
+                        breathing: true,
+                        stretch: true,
+                        motivation: true
+                    }
+                };
+                
+                logStatus('Starting migration test...', 'info');
+                
+                const migratedConfig = testMigrationManager.migrateExistingConfig(testConfig);
+                
+                // Display results
+                const migratedConfigDiv = document.getElementById('migratedConfig');
+                migratedConfigDiv.innerHTML = `
+                    <p><strong>Provider:</strong> ${migratedConfig.externalAvatarProvider || 'N/A'}</p>
+                    <p><strong>URL:</strong> <small>${migratedConfig.externalAvatarUrl || 'N/A'}</small></p>
+                    <p><strong>Use External:</strong> ${migratedConfig.useExternalAvatar ? 'Oui' : 'Non'}</p>
+                `;
+                
+                const migrationResults = document.getElementById('migrationResults');
+                migrationResults.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check"></i> Migration Réussie</h6>
+                        <p>Configuration migrée avec succès vers le système externe.</p>
+                    </div>
+                `;
+                
+                logStatus('Migration test completed successfully', 'success');
+                
+            } catch (error) {
+                const migrationResults = document.getElementById('migrationResults');
+                migrationResults.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6><i class="fas fa-times"></i> Migration Échouée</h6>
+                        <p><strong>Erreur:</strong> ${error.message}</p>
+                    </div>
+                `;
+                logStatus('Migration test failed: ' + error.message, 'error');
+            }
+        }
+        
+        function testIntegration(type) {
+            logStatus(`Testing integration for: ${type}`, 'info');
+            
+            const integrationResults = document.getElementById('integrationResults');
+            let testResult = '';
+            
+            switch (type) {
+                case 'main':
+                    testResult = 'Test avatar principal: Vérification de l\'affichage dans l\'interface principale';
+                    break;
+                case 'breathing':
+                    testResult = 'Test exercice respiration: Vérification de l\'avatar dans le modal d\'exercice';
+                    break;
+                case 'stretch':
+                    testResult = 'Test exercice étirement: Vérification de l\'avatar dans le modal d\'étirement';
+                    break;
+                case 'motivation':
+                    testResult = 'Test citation motivante: Vérification de l\'avatar dans le modal de citation';
+                    break;
+            }
+            
+            integrationResults.innerHTML = `
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Test d'Intégration: ${type}</h6>
+                    <p>${testResult}</p>
+                    <p><em>Pour tester complètement, ouvrez l'application principale et utilisez les fonctionnalités d'avatar.</em></p>
+                </div>
+            `;
+            
+            logStatus(`Integration test for ${type} documented`, 'success');
+        }
+        
+        function loadCurrentConfiguration() {
+            const saved = localStorage.getItem('psybot_avatar');
+            const currentConfig = document.getElementById('currentConfig');
+            
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    currentConfig.innerHTML = `
+                        <p><strong>Emoji:</strong> ${config.emoji}</p>
+                        <p><strong>Nom:</strong> ${config.name}</p>
+                        <p><strong>Couleur de peau:</strong> ${config.skinColor}</p>
+                        <p><strong>Genre:</strong> ${config.gender}</p>
+                        <p><strong>Style:</strong> ${config.style || config.outfit?.style}</p>
+                    `;
+                } catch (error) {
+                    currentConfig.innerHTML = '<p class="text-danger">Erreur de parsing de la configuration</p>';
+                }
+            } else {
+                currentConfig.innerHTML = '<p class="text-muted">Aucune configuration sauvegardée</p>';
+            }
+        }
+        
+        function checkSystemStatus() {
+            const statusDiv = document.getElementById('systemStatus');
+            let statusHtml = '';
+            
+            // Check External Avatar System
+            if (typeof ExternalAvatarSystem !== 'undefined') {
+                statusHtml += '<p><span class="status-indicator status-success"></span>External Avatar System: Disponible</p>';
+            } else {
+                statusHtml += '<p><span class="status-indicator status-error"></span>External Avatar System: Non disponible</p>';
+            }
+            
+            // Check Migration Manager
+            if (typeof AvatarMigrationManager !== 'undefined') {
+                statusHtml += '<p><span class="status-indicator status-success"></span>Avatar Migration Manager: Disponible</p>';
+            } else {
+                statusHtml += '<p><span class="status-indicator status-error"></span>Avatar Migration Manager: Non disponible</p>';
+            }
+            
+            // Check if systems initialized
+            if (testExternalAvatarSystem) {
+                statusHtml += '<p><span class="status-indicator status-success"></span>External Avatar System: Initialisé</p>';
+            } else {
+                statusHtml += '<p><span class="status-indicator status-error"></span>External Avatar System: Non initialisé</p>';
+            }
+            
+            if (testMigrationManager) {
+                statusHtml += '<p><span class="status-indicator status-success"></span>Migration Manager: Initialisé</p>';
+            } else {
+                statusHtml += '<p><span class="status-indicator status-error"></span>Migration Manager: Non initialisé</p>';
+            }
+            
+            statusDiv.innerHTML = statusHtml;
+        }
+        
+        function logStatus(message, type) {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            // Update system status if needed
+            const statusOverview = document.getElementById('statusOverview');
+            if (type === 'error') {
+                statusOverview.classList.add('test-failed');
+                statusOverview.classList.remove('test-passed');
+            } else if (type === 'success') {
+                statusOverview.classList.add('test-passed');
+                statusOverview.classList.remove('test-failed');
+            }
+        }
+    </script>
+</body>
+</html>

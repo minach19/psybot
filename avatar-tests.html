@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsyBot Avatar System Tests</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 2rem;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-results {
+            margin-top: 2rem;
+        }
+        .test-group {
+            margin-bottom: 1.5rem;
+        }
+        .test-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .test-passed {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid #28a745;
+        }
+        .test-failed {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+        }
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+        .avatar-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+        .animation-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem;
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-container">
+            <div class="header">
+                <h1>PsyBot Avatar System Tests</h1>
+                <p class="text-muted">Test runner for avatar functionality</p>
+            </div>
+
+            <div class="avatar-preview">
+                <div id="animationContainer" class="animation-container"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <button id="runTestsBtn" class="btn btn-primary w-100">Run All Tests</button>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <button id="testAnimationBtn" class="btn btn-outline-primary w-100">Test Animation</button>
+                </div>
+            </div>
+
+            <div id="testStats" class="stats d-none">
+                <div class="stat-item bg-success bg-opacity-10">
+                    <h4 id="passCount">0</h4>
+                    <p>Passed</p>
+                </div>
+                <div class="stat-item bg-danger bg-opacity-10">
+                    <h4 id="failCount">0</h4>
+                    <p>Failed</p>
+                </div>
+                <div class="stat-item bg-info bg-opacity-10">
+                    <h4 id="totalCount">0</h4>
+                    <p>Total</p>
+                </div>
+            </div>
+
+            <div id="testResults" class="test-results"></div>
+        </div>
+    </div>
+
+    <!-- Load Lottie Player -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
+    
+    <!-- Load your JS files -->
+    <script src="/static/js/avatar-customizer.js"></script>
+    <script src="/static/js/avatar-mood-integration.js"></script>
+    <script src="/static/js/avatar-test-suite.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const runTestsBtn = document.getElementById('runTestsBtn');
+            const testAnimationBtn = document.getElementById('testAnimationBtn');
+            const testResults = document.getElementById('testResults');
+            const testStats = document.getElementById('testStats');
+            const passCount = document.getElementById('passCount');
+            const failCount = document.getElementById('failCount');
+            const totalCount = document.getElementById('totalCount');
+            const animationContainer = document.getElementById('animationContainer');
+            
+            let animation = null;
+            
+            // Initialize Lottie animation
+            function initAnimation(animationPath) {
+                if (animation) {
+                    animation.destroy();
+                }
+                
+                animation = lottie.loadAnimation({
+                    container: animationContainer,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: animationPath || '/static/animations/default_animation.json'
+                });
+                
+                animation.addEventListener('data_failed', function() {
+                    console.error('Failed to load animation');
+                    // Try with default animation
+                    if (animationPath !== '/static/animations/default_animation.json') {
+                        initAnimation('/static/animations/default_animation.json');
+                    }
+                });
+            }
+            
+            // Run all tests
+            runTestsBtn.addEventListener('click', function() {
+                testResults.innerHTML = '<div class="alert alert-info">Running tests...</div>';
+                
+                // Small delay to allow UI to update
+                setTimeout(function() {
+                    const results = window.avatarTestSuite.runAllTests();
+                    
+                    // Update stats
+                    passCount.textContent = results.passed;
+                    failCount.textContent = results.failed;
+                    totalCount.textContent = results.total;
+                    testStats.classList.remove('d-none');
+                    
+                    // Generate results HTML
+                    let resultsHTML = '';
+                    
+                    // Group tests by category
+                    const testGroups = {};
+                    results.tests.forEach(test => {
+                        const groupName = test.name.split(' - ')[0];
+                        if (!testGroups[groupName]) {
+                            testGroups[groupName] = [];
+                        }
+                        testGroups[groupName].push(test);
+                    });
+                    
+                    // Generate HTML for each group
+                    for (const [groupName, tests] of Object.entries(testGroups)) {
+                        resultsHTML += `<div class="test-group">
+                            <h4>${groupName}</h4>
+                        `;
+                        
+                        tests.forEach(test => {
+                            const testName = test.name.split(' - ')[1];
+                            resultsHTML += `
+                                <div class="test-item ${test.passed ? 'test-passed' : 'test-failed'}">
+                                    <div class="d-flex justify-content-between">
+                                        <span>${testName}</span>
+                                        <span>${test.passed ? '✅ Passed' : '❌ Failed'}</span>
+                                    </div>
+                                    ${test.error && !test.passed ? `<div class="text-danger small mt-1">${test.error}</div>` : ''}
+                                </div>
+                            `;
+                        });
+                        
+                        resultsHTML += '</div>';
+                    }
+                    
+                    testResults.innerHTML = resultsHTML;
+                }, 100);
+            });
+            
+            // Test animation
+            testAnimationBtn.addEventListener('click', function() {
+                initAnimation('/static/animations/default_animation.json');
+            });
+            
+            // Init default animation
+            initAnimation('/static/animations/default_animation.json');
+        });
+    </script>
+</body>
+</html>

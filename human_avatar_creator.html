@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créateur d'Avatar Humain - PsyBot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- ReadyPlayerMe SDK -->
+    <script src="https://unpkg.com/@readyplayerme/web-sdk@latest/dist/readyplayerme.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .creator-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 1200px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .avatar-preview-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .avatar-created {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-create-avatar {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-create-avatar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+            color: white;
+        }
+        
+        .readyplayerme-modal {
+            backdrop-filter: blur(10px);
+        }
+        
+        .steps-container {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        
+        .step-number {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+        
+        .integration-status {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .avatar-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .avatar-sample {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .avatar-sample img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="creator-container">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-user-astronaut"></i> Créateur d'Avatar Humain
+                </h1>
+                <p class="lead">Créez votre avatar personnalisé réaliste avec Ready Player Me</p>
+                <p class="text-muted">Une expérience similaire à Bitmoji, mais en 3D et ultra-réaliste</p>
+            </div>
+            
+            <!-- Status de l'intégration -->
+            <div class="integration-status">
+                <h5><i class="fas fa-check-circle text-success"></i> Intégration Ready Player Me Active</h5>
+                <p class="mb-0">Le système d'avatar humain est intégré avec succès dans PsyBot. Vous pouvez maintenant créer des avatars réalistes qui vous accompagneront dans vos exercices de bien-être.</p>
+            </div>
+            
+            <!-- Main Creation Area -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="feature-card">
+                        <h3><i class="fas fa-magic"></i> Créateur d'Avatar</h3>
+                        <p>Lancez l'éditeur Ready Player Me pour créer votre avatar personnalisé en quelques minutes.</p>
+                        
+                        <div class="text-center my-4">
+                            <button id="createHumanAvatarDemo" class="btn btn-create-avatar">
+                                <i class="fas fa-user-plus"></i> Créer Mon Avatar Humain
+                            </button>
+                        </div>
+                        
+                        <div class="steps-container">
+                            <h5><i class="fas fa-list-ol"></i> Comment ça marche :</h5>
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div>Cliquez sur "Créer Mon Avatar Humain"</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div>Personnalisez votre avatar dans l'éditeur</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div>Votre avatar sera automatiquement sauvegardé</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div>Utilisez-le dans tous vos exercices PsyBot</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="avatar-preview-card">
+                        <h4><i class="fas fa-eye"></i> Votre Avatar</h4>
+                        <div id="avatarPreviewDemo" class="my-4">
+                            <div class="text-center p-4">
+                                <i class="fas fa-user-circle" style="font-size: 120px; color: #ccc;"></i>
+                                <p class="text-muted mt-3">Votre avatar apparaîtra ici après création</p>
+                            </div>
+                        </div>
+                        
+                        <div id="avatarInfo" class="mt-3" style="display: none;">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-check"></i> Avatar créé avec succès!</h6>
+                                <p id="avatarUrl" class="mb-0"></p>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-3">
+                                <button id="useInPsyBot" class="btn btn-primary">
+                                    <i class="fas fa-robot"></i> Utiliser dans PsyBot
+                                </button>
+                                <button id="createAnother" class="btn btn-outline-secondary">
+                                    <i class="fas fa-sync-alt"></i> Créer un Autre Avatar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <i class="fas fa-paint-brush fa-3x text-primary mb-3"></i>
+                        <h5>Personnalisation Avancée</h5>
+                        <p>Cheveux, vêtements, accessoires, expressions faciales... Tout est personnalisable!</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <i class="fas fa-cube fa-3x text-success mb-3"></i>
+                        <h5>Rendu 3D Réaliste</h5>
+                        <p>Avatars en 3D haute qualité compatibles avec les applications de métaverse.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h5>Intégration Wellness</h5>
+                        <p>Votre avatar vous accompagne dans tous vos exercices de bien-être PsyBot.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exemples d'avatars -->
+            <div class="mt-5">
+                <h3 class="text-center mb-4"><i class="fas fa-users"></i> Exemples d'Avatars</h3>
+                <div class="avatar-gallery">
+                    <div class="avatar-sample">
+                        <img src="https://models.readyplayer.me/64bc36c4c4aba4ddad1ba0cf.png" alt="Exemple Avatar 1">
+                        <p><small>Style Professionnel</small></p>
+                    </div>
+                    <div class="avatar-sample">
+                        <img src="https://models.readyplayer.me/64bc36c4c4aba4ddad1ba0d1.png" alt="Exemple Avatar 2">
+                        <p><small>Style Décontracté</small></p>
+                    </div>
+                    <div class="avatar-sample">
+                        <img src="https://models.readyplayer.me/64bc36c4c4aba4ddad1ba0d3.png" alt="Exemple Avatar 3">
+                        <p><small>Style Sportif</small></p>
+                    </div>
+                    <div class="avatar-sample">
+                        <img src="https://models.readyplayer.me/64bc36c4c4aba4ddad1ba0d5.png" alt="Exemple Avatar 4">
+                        <p><small>Style Créatif</small></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test Integration -->
+            <div class="mt-5">
+                <div class="feature-card">
+                    <h4><i class="fas fa-flask"></i> Test d'Intégration</h4>
+                    <p>Testez l'intégration de votre avatar avec les différentes fonctionnalités de PsyBot :</p>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <button id="testBreathing" class="btn btn-info w-100 mb-2">
+                                <i class="fas fa-lungs"></i> Test Respiration
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="testStretching" class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-dumbbell"></i> Test Étirement
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="testMotivation" class="btn btn-warning w-100 mb-2">
+                                <i class="fas fa-quote-left"></i> Test Motivation
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="testMainApp" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-robot"></i> Ouvrir PsyBot
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="testResults" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include External Avatar System -->
+    <script src="/static/js/external-avatar-system.js"></script>
+    
+    <script>
+        let avatarSystem = null;
+        let currentAvatarUrl = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 Human Avatar Creator initialized');
+            
+            // Initialize avatar system
+            if (typeof ExternalAvatarSystem !== 'undefined') {
+                avatarSystem = new ExternalAvatarSystem();
+                console.log('✅ External Avatar System loaded');
+            } else {
+                console.error('❌ External Avatar System not found');
+            }
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Load existing avatar if available
+            loadExistingAvatar();
+        });
+        
+        function setupEventListeners() {
+            // Create human avatar button
+            const createBtn = document.getElementById('createHumanAvatarDemo');
+            if (createBtn) {
+                createBtn.addEventListener('click', createHumanAvatar);
+            }
+            
+            // Use in PsyBot button
+            const useBtn = document.getElementById('useInPsyBot');
+            if (useBtn) {
+                useBtn.addEventListener('click', useAvatarInPsyBot);
+            }
+            
+            // Create another avatar button
+            const createAnotherBtn = document.getElementById('createAnother');
+            if (createAnotherBtn) {
+                createAnotherBtn.addEventListener('click', createAnotherAvatar);
+            }
+            
+            // Test buttons
+            document.getElementById('testBreathing')?.addEventListener('click', () => testIntegration('breathing'));
+            document.getElementById('testStretching')?.addEventListener('click', () => testIntegration('stretching'));
+            document.getElementById('testMotivation')?.addEventListener('click', () => testIntegration('motivation'));
+            document.getElementById('testMainApp')?.addEventListener('click', () => window.open('/', '_blank'));
+        }
+          async function createHumanAvatar() {
+            const createBtn = document.getElementById('createHumanAvatarDemo');
+            
+            if (!avatarSystem || typeof avatarSystem.openReadyPlayerMeEditor !== 'function') {
+                showAlert('Le système d\'avatar n\'est pas disponible. Veuillez rafraîchir la page.', 'warning');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ouverture de l\'éditeur Ready Player Me...';
+                createBtn.disabled = true;
+                
+                console.log('🚀 Opening ReadyPlayerMe editor...');
+                
+                // Open ReadyPlayerMe editor
+                const avatarUrl = await avatarSystem.openReadyPlayerMeEditor();
+                
+                console.log('✅ Avatar created successfully:', avatarUrl);
+                
+                // Store avatar URL
+                currentAvatarUrl = avatarUrl;
+                
+                // Update preview
+                updateAvatarPreview(avatarUrl);
+                
+                // Show avatar info
+                showAvatarInfo(avatarUrl);
+                
+                // Show success message
+                showAlert('Avatar créé avec succès! Il est maintenant sauvegardé et prêt à être utilisé dans PsyBot.', 'success');
+                
+                // Reset button
+                createBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer Mon Avatar Humain';
+                createBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('❌ Error creating avatar:', error);
+                
+                // Show error message
+                showAlert('Erreur lors de la création de l\'avatar. Cela peut être dû à une connexion internet instable ou un timeout. Veuillez réessayer.', 'danger');
+                
+                // Reset button
+                createBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer Mon Avatar Humain';
+                createBtn.disabled = false;
+            }
+        }
+          function updateAvatarPreview(avatarUrl) {
+            const preview = document.getElementById('avatarPreviewDemo');
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="text-center">
+                        <img src="${avatarUrl}" alt="Avatar Créé" class="avatar-created mb-3" style="
+                            max-width: 200px;
+                            max-height: 200px;
+                            border-radius: 50%;
+                            border: 4px solid #28a745;
+                            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+                            animation: avatarBounce 0.6s ease;
+                        ">
+                        <div class="alert alert-success d-flex align-items-center" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <div>
+                                <strong>Avatar créé avec succès!</strong><br>
+                                <small>Votre avatar est maintenant synchronisé avec PsyBot</small>
+                            </div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes avatarBounce {
+                            0% { transform: scale(0.8); opacity: 0; }
+                            50% { transform: scale(1.05); }
+                            100% { transform: scale(1); opacity: 1; }
+                        }
+                    </style>
+                `;
+            }
+        }
+        
+        function showAvatarInfo(avatarUrl) {
+            const avatarInfo = document.getElementById('avatarInfo');
+            const avatarUrlElement = document.getElementById('avatarUrl');
+            
+            if (avatarInfo && avatarUrlElement) {
+                avatarUrlElement.innerHTML = `<strong>URL:</strong> <small>${avatarUrl}</small>`;
+                avatarInfo.style.display = 'block';
+            }
+        }
+        
+        function useAvatarInPsyBot() {
+            if (!currentAvatarUrl) {
+                alert('Aucun avatar n\'a été créé.');
+                return;
+            }
+            
+            try {
+                // Save to localStorage for PsyBot to use
+                const avatarConfig = JSON.parse(localStorage.getItem('psybot_avatar') || '{}');
+                avatarConfig.useExternalAvatar = true;
+                avatarConfig.externalAvatarUrl = currentAvatarUrl;
+                avatarConfig.externalAvatarProvider = 'readyplayerme';
+                
+                localStorage.setItem('psybot_avatar', JSON.stringify(avatarConfig));
+                
+                // Show success message
+                const testResults = document.getElementById('testResults');
+                if (testResults) {
+                    testResults.innerHTML = `
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-check"></i> Avatar sauvegardé dans PsyBot!</h6>
+                            <p>Votre avatar humain est maintenant configuré et sera utilisé dans l'application principale.</p>
+                            <a href="/" class="btn btn-primary btn-sm">Ouvrir PsyBot</a>
+                        </div>
+                    `;
+                }
+                
+                console.log('✅ Avatar saved to PsyBot configuration');
+                
+            } catch (error) {
+                console.error('❌ Error saving avatar:', error);
+                alert('Erreur lors de la sauvegarde de l\'avatar.');
+            }
+        }
+        
+        function createAnotherAvatar() {
+            // Reset preview
+            const preview = document.getElementById('avatarPreviewDemo');
+            if (preview) {
+                preview.innerHTML = `
+                    <div class="text-center p-4">
+                        <i class="fas fa-user-circle" style="font-size: 120px; color: #ccc;"></i>
+                        <p class="text-muted mt-3">Votre nouvel avatar apparaîtra ici</p>
+                    </div>
+                `;
+            }
+            
+            // Hide avatar info
+            const avatarInfo = document.getElementById('avatarInfo');
+            if (avatarInfo) {
+                avatarInfo.style.display = 'none';
+            }
+            
+            // Reset current avatar
+            currentAvatarUrl = null;
+            
+            // Create new avatar
+            createHumanAvatar();
+        }
+        
+        function testIntegration(type) {
+            const testResults = document.getElementById('testResults');
+            if (!testResults) return;
+            
+            const messages = {
+                breathing: 'Test de l\'intégration avatar dans les exercices de respiration',
+                stretching: 'Test de l\'intégration avatar dans les exercices d\'étirement',
+                motivation: 'Test de l\'intégration avatar dans les citations motivantes'
+            };
+            
+            testResults.innerHTML = `
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Test d'Intégration: ${type}</h6>
+                    <p>${messages[type]}</p>
+                    <p><em>Pour tester complètement, ouvrez PsyBot et utilisez les fonctionnalités d'exercices.</em></p>
+                    <a href="/" class="btn btn-primary btn-sm" target="_blank">Ouvrir PsyBot pour Test</a>
+                </div>
+            `;
+        }
+          function loadExistingAvatar() {
+            try {
+                const avatarConfig = JSON.parse(localStorage.getItem('psybot_avatar') || '{}');
+                
+                if (avatarConfig.useExternalAvatar && 
+                    avatarConfig.externalAvatarUrl && 
+                    avatarConfig.externalAvatarProvider === 'readyplayerme') {
+                    
+                    currentAvatarUrl = avatarConfig.externalAvatarUrl;
+                    updateAvatarPreview(currentAvatarUrl);
+                    showAvatarInfo(currentAvatarUrl);
+                    
+                    console.log('✅ Existing ReadyPlayerMe avatar loaded');
+                    showAlert('Avatar ReadyPlayerMe existant chargé avec succès.', 'info');
+                }
+            } catch (error) {
+                console.error('Error loading existing avatar:', error);
+            }
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer') || createAlertContainer();
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.setAttribute('role', 'alert');
+            alert.innerHTML = `
+                ${getAlertIcon(type)} ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            alertContainer.appendChild(alert);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+        
+        function createAlertContainer() {
+            const container = document.createElement('div');
+            container.id = 'alertContainer';
+            container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            document.body.appendChild(container);
+            return container;
+        }
+        
+        function getAlertIcon(type) {
+            const icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                danger: '<i class="fas fa-times-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
+            return icons[type] || icons.info;
+        }
+    </script>
+</body>
+</html>

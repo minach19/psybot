@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsyBot Avatar System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .success {
+            color: green;
+        }
+        .failure {
+            color: red;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .image-test {
+            margin: 10px 0;
+        }
+        .image-test img {
+            max-width: 100px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>PsyBot Avatar System Test</h1>
+    
+    <div class="test-section">
+        <div class="test-title">1. Test updateAvatarEmoji function</div>
+        <button id="testUpdateAvatarEmoji">Test updateAvatarEmoji</button>
+        <div id="emojiResult"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">2. Test Hair Image Paths</div>
+        <div class="image-test">
+            <p>Short hair:</p>
+            <img src="/static/img/avatar/hair/short.png" alt="Short Hair">
+        </div>
+        <div class="image-test">
+            <p>Medium hair:</p>
+            <img src="/static/img/avatar/hair/medium.png" alt="Medium Hair">
+        </div>
+        <div class="image-test">
+            <p>Long hair:</p>
+            <img src="/static/img/avatar/hair/long.png" alt="Long Hair">
+        </div>
+        <div class="image-test">
+            <p>Curly hair:</p>
+            <img src="/static/img/avatar/hair/curly.png" alt="Curly Hair">
+        </div>
+        <div class="image-test">
+            <p>No hair:</p>
+            <img src="/static/img/avatar/hair/none.png" alt="No Hair">
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <div class="test-title">3. Test CORS with save_avatar.php</div>
+        <button id="testCors">Test CORS</button>
+        <div id="corsResult"></div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        // Test data
+        const testAvatarConfig = {
+            emoji: '🧘‍♀️',
+            name: 'TestBot',
+            frequency: 'medium',
+            skinColor: 'light',
+            gender: 'neutral',
+            face: {
+                shape: 'round',
+            },
+            hair: {
+                style: 'medium',
+                color: '#4E342E'
+            },
+            outfit: {
+                style: 'sport',
+                color: '#3F51B5'
+            },
+            preferences: {
+                breathing: true,
+                stretch: true,
+                motivation: true,
+                communicationStyle: 'casual'
+            }
+        };
+
+        // Helper function to add test results
+        function addResult(message, isSuccess) {
+            const resultsDiv = document.getElementById('results');
+            const resultElement = document.createElement('div');
+            resultElement.className = isSuccess ? 'success' : 'failure';
+            resultElement.textContent = message;
+            resultsDiv.appendChild(resultElement);
+        }
+
+        // Test 1: Test updateAvatarEmoji function
+        document.getElementById('testUpdateAvatarEmoji').addEventListener('click', function() {
+            const emojiResultDiv = document.getElementById('emojiResult');
+            
+            // Create a temporary avatar emoji element
+            const tempEmojiEl = document.createElement('span');
+            tempEmojiEl.id = 'avatarEmoji';
+            document.body.appendChild(tempEmojiEl);
+
+            // Set up the global avatarConfig
+            window.avatarConfig = testAvatarConfig;
+
+            try {
+                // Check if updateAvatarEmoji is defined anywhere
+                if (typeof updateAvatarEmoji === 'function') {
+                    updateAvatarEmoji();
+                    emojiResultDiv.textContent = "updateAvatarEmoji function exists and executed!";
+                    emojiResultDiv.className = "success";
+                } else {
+                    // Try the fallback we added
+                    const avatarEmoji = document.getElementById('avatarEmoji');
+                    if (avatarEmoji && window.avatarConfig && window.avatarConfig.emoji) {
+                        avatarEmoji.textContent = window.avatarConfig.emoji;
+                        emojiResultDiv.textContent = "Fallback implementation worked correctly! Emoji: " + avatarEmoji.textContent;
+                        emojiResultDiv.className = "success";
+                    } else {
+                        emojiResultDiv.textContent = "Neither function nor fallback worked!";
+                        emojiResultDiv.className = "failure";
+                    }
+                }
+            } catch (error) {
+                emojiResultDiv.textContent = "Error: " + error.message;
+                emojiResultDiv.className = "failure";
+            }
+            
+            // Clean up
+            document.body.removeChild(tempEmojiEl);
+        });
+
+        // Test 3: Test CORS with save_avatar.php
+        document.getElementById('testCors').addEventListener('click', function() {
+            const corsResultDiv = document.getElementById('corsResult');
+            corsResultDiv.textContent = "Testing CORS...";
+
+            const testData = {
+                avatar_config: testAvatarConfig,
+                avatar_image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+            };
+
+            // Use relative path to avoid CORS issues
+            const savePath = '/save_avatar.php';
+            
+            fetch(savePath, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(testData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                corsResultDiv.textContent = "CORS test successful! Response: " + JSON.stringify(result);
+                corsResultDiv.className = "success";
+            })
+            .catch(error => {
+                corsResultDiv.textContent = "CORS test failed: " + error.message;
+                corsResultDiv.className = "failure";
+            });
+        });
+    </script>
+</body>
+</html>

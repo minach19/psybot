@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Function Test</title>
+</head>
+<body>
+    <h1>JavaScript Function Test</h1>
+    <button onclick="testSendMessage()">Test sendMessage</button>
+    <button onclick="testToggleHistory()">Test toggleHistory</button>
+    <button onclick="testToggleDarkMode()">Test toggleDarkMode</button>
+    <button onclick="testToggleWellness()">Test toggleWellness</button>
+    <button onclick="testAnalyzeMood()">Test analyzeMood</button>
+    <button onclick="testAvatarSpeak()">Test avatarSpeak</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        function testSendMessage() {
+            try {
+                if (typeof sendMessage === 'function') {
+                    document.getElementById('results').innerHTML += '<p>✅ sendMessage function exists</p>';
+                } else {
+                    document.getElementById('results').innerHTML += '<p>❌ sendMessage function not found</p>';
+                }
+            } catch (e) {
+                document.getElementById('results').innerHTML += '<p>❌ Error testing sendMessage: ' + e.message + '</p>';
+            }
+        }
+        
+        function testToggleHistory() {
+            try {
+                if (typeof toggleHistory === 'function') {
+                    document.getElementById('results').innerHTML += '<p>✅ toggleHistory function exists</p>';
+                } else {
+                    document.getElementById('results').innerHTML += '<p>❌ toggleHistory function not found</p>';
+                }
+            } catch (e) {
+                document.getElementById('results').innerHTML += '<p>❌ Error testing toggleHistory: ' + e.message + '</p>';
+            }
+        }
+        
+        function testToggleDarkMode() {
+            try {
+                if (typeof toggleDarkMode === 'function') {
+                    document.getElementById('results').innerHTML += '<p>✅ toggleDarkMode function exists</p>';
+                } else {
+                    document.getElementById('results').innerHTML += '<p>❌ toggleDarkMode function not found</p>';
+                }
+            } catch (e) {
+                document.getElementById('results').innerHTML += '<p>❌ Error testing toggleDarkMode: ' + e.message + '</p>';
+            }
+        }
+        
+        function testToggleWellness() {
+            try {
+                if (typeof toggleWellness === 'function') {
+                    document.getElementById('results').innerHTML += '<p>✅ toggleWellness function exists</p>';
+                } else {
+                    document.getElementById('results').innerHTML += '<p>❌ toggleWellness function not found</p>';
+                }
+            } catch (e) {
+                document.getElementById('results').innerHTML += '<p>❌ Error testing toggleWellness: ' + e.message + '</p>';
+            }
+        }
+        
+        function testAnalyzeMood() {
+            try {
+                if (typeof analyzeMood === 'function') {
+                    document.getElementById('results').innerHTML += '<p>✅ analyzeMood function exists</p>';
+                } else {
+                    document.getElementById('results').innerHTML += '<p>❌ analyzeMood function not found</p>';
+                }
+            } catch (e) {
+                document.getElementById('results').innerHTML += '<p>❌ Error testing analyzeMood: ' + e.message + '</p>';
+            }
+        }
+        
+        function testAvatarSpeak() {
+            try {
+                if (typeof avatarSpeak === 'function') {
+                    document.getElementById('results').innerHTML += '<p>✅ avatarSpeak function exists</p>';
+                } else {
+                    document.getElementById('results').innerHTML += '<p>❌ avatarSpeak function not found</p>';
+                }
+            } catch (e) {
+                document.getElementById('results').innerHTML += '<p>❌ Error testing avatarSpeak: ' + e.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

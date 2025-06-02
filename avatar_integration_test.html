@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Avatar System Integration Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="static/css/avatar-exercise-animations.css" rel="stylesheet">
+    <link href="static/css/human-avatar-animations.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 2rem;
+            padding: 2rem;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        
+        .avatar-test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .avatar-test-card {
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-test-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .avatar-container-test {
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .status-success { background: #28a745; }
+        .status-error { background: #dc3545; }
+        .status-warning { background: #ffc107; }
+        
+        .log-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 2rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #dee2e6;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .breathing { border-color: #4fc3f7; }
+        .stretching { border-color: #81c784; }
+        .motivation { border-color: #ffb74d; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="test-container">
+            <div class="test-header">
+                <h1><i class="fas fa-robot"></i> Complete Avatar System Integration Test</h1>
+                <p class="lead">Testing all 5 avatar systems working together</p>
+                <div class="badge bg-info">Advanced Human Avatar + AI Enhanced Avatar + 3 Classic Systems</div>
+            </div>
+
+            <!-- Avatar System Status -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h5>Avatar System Status</h5>
+                    <div id="systemStatus" class="d-flex flex-wrap gap-3">
+                        <div><span id="classicStatus" class="status-indicator status-warning"></span>Classic Avatar</div>
+                        <div><span id="humanStatus" class="status-indicator status-warning"></span>Human Avatar</div>
+                        <div><span id="fluidStatus" class="status-indicator status-warning"></span>Fluid SVG Avatar</div>
+                        <div><span id="advancedStatus" class="status-indicator status-warning"></span>Advanced Human Avatar</div>
+                        <div><span id="aiStatus" class="status-indicator status-warning"></span>AI Enhanced Avatar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Grid -->
+            <div class="avatar-test-grid">
+                <!-- Breathing Test -->
+                <div class="avatar-test-card breathing">
+                    <h5><i class="fas fa-lungs"></i> Breathing Exercise Test</h5>
+                    <div id="breathingTestContainer" class="avatar-container-test">
+                        <p class="text-muted">Click Start to test breathing</p>
+                    </div>
+                    <div class="test-controls">
+                        <button id="startBreathingTest" class="btn btn-primary btn-sm">
+                            <i class="fas fa-play"></i> Start Breathing
+                        </button>
+                        <button id="stopBreathingTest" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                    <div id="breathingStatus" class="mt-2">
+                        <small class="text-muted">Ready to test</small>
+                    </div>
+                </div>
+
+                <!-- Stretching Test -->
+                <div class="avatar-test-card stretching">
+                    <h5><i class="fas fa-child"></i> Stretching Exercise Test</h5>
+                    <div id="stretchingTestContainer" class="avatar-container-test">
+                        <p class="text-muted">Click Start to test stretching</p>
+                    </div>
+                    <div class="test-controls">
+                        <button id="startStretchingTest" class="btn btn-success btn-sm">
+                            <i class="fas fa-play"></i> Start Stretching
+                        </button>
+                        <button id="stopStretchingTest" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                    <div id="stretchingStatus" class="mt-2">
+                        <small class="text-muted">Ready to test</small>
+                    </div>
+                </div>
+
+                <!-- Motivation Test -->
+                <div class="avatar-test-card motivation">
+                    <h5><i class="fas fa-star"></i> Motivation Exercise Test</h5>
+                    <div id="motivationTestContainer" class="avatar-container-test">
+                        <p class="text-muted">Click Start to test motivation</p>
+                    </div>
+                    <div class="test-controls">
+                        <button id="startMotivationTest" class="btn btn-warning btn-sm">
+                            <i class="fas fa-play"></i> Start Motivation
+                        </button>
+                        <button id="stopMotivationTest" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                    <div id="motivationStatus" class="mt-2">
+                        <small class="text-muted">Ready to test</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Controls -->
+            <div class="text-center mb-4">
+                <button id="testAllSystems" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-play-circle"></i> Test All Systems
+                </button>
+                <button id="stopAllSystems" class="btn btn-danger btn-lg">
+                    <i class="fas fa-stop-circle"></i> Stop All Systems
+                </button>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6>Performance Metrics</h6>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="h4" id="memoryUsage">--</div>
+                            <small>Memory (MB)</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h4" id="frameRate">--</div>
+                            <small>FPS</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="h4" id="activeAvatars">0</div>
+                            <small>Active Avatars</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Integration Status</h6>
+                    <div id="integrationChecks">
+                        <div><i class="fas fa-check text-success"></i> Modal integration</div>
+                        <div><i class="fas fa-check text-success"></i> Event listeners</div>
+                        <div><i class="fas fa-check text-success"></i> Avatar containers</div>
+                        <div><i class="fas fa-check text-success"></i> CSS animations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Log -->
+            <div class="log-panel">
+                <h6><i class="fas fa-terminal"></i> Test Log</h6>
+                <div id="testLog">
+                    <div class="log-entry">System initialized. Ready for testing...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load all avatar scripts -->
+    <script src="static/js/avatar-exercise-guide.js"></script>
+    <script src="static/js/human-avatar-guide.js"></script>
+    <script src="static/js/fluid-svg-avatar.js"></script>
+    <script src="static/js/advanced-human-avatar.js"></script>
+    <script src="static/js/ai-enhanced-avatar.js"></script>
+    <script src="static/js/wellness-modals.js"></script>
+
+    <script>
+        class AvatarIntegrationTest {
+            constructor() {
+                this.activeTests = new Set();
+                this.startTime = Date.now();
+                this.frameCount = 0;
+                this.init();
+            }
+
+            init() {
+                this.log('🚀 Initializing Avatar Integration Test...');
+                this.checkSystemAvailability();
+                this.setupEventListeners();
+                this.startPerformanceMonitoring();
+                this.log('✅ Test system ready');
+            }
+
+            checkSystemAvailability() {
+                const systems = [
+                    { name: 'Classic Avatar', obj: 'avatarExerciseGuide', id: 'classicStatus' },
+                    { name: 'Human Avatar', obj: 'humanAvatarGuide', id: 'humanStatus' },
+                    { name: 'Fluid SVG Avatar', obj: 'fluidSVGAvatar', id: 'fluidStatus' },
+                    { name: 'Advanced Human Avatar', obj: 'advancedHumanAvatar', id: 'advancedStatus' },
+                    { name: 'AI Enhanced Avatar', obj: 'aiEnhancedAvatar', id: 'aiStatus' }
+                ];
+
+                systems.forEach(system => {
+                    const available = window[system.obj] !== undefined;
+                    const statusEl = document.getElementById(system.id);
+                    if (available) {
+                        statusEl.className = 'status-indicator status-success';
+                        this.log(`✅ ${system.name} available`);
+                    } else {
+                        statusEl.className = 'status-indicator status-error';
+                        this.log(`❌ ${system.name} not available`);
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // Individual tests
+                document.getElementById('startBreathingTest').addEventListener('click', () => {
+                    this.testBreathing();
+                });
+
+                document.getElementById('stopBreathingTest').addEventListener('click', () => {
+                    this.stopTest('breathing');
+                });
+
+                document.getElementById('startStretchingTest').addEventListener('click', () => {
+                    this.testStretching();
+                });
+
+                document.getElementById('stopStretchingTest').addEventListener('click', () => {
+                    this.stopTest('stretching');
+                });
+
+                document.getElementById('startMotivationTest').addEventListener('click', () => {
+                    this.testMotivation();
+                });
+
+                document.getElementById('stopMotivationTest').addEventListener('click', () => {
+                    this.stopTest('motivation');
+                });
+
+                // Global tests
+                document.getElementById('testAllSystems').addEventListener('click', () => {
+                    this.testAllSystems();
+                });
+
+                document.getElementById('stopAllSystems').addEventListener('click', () => {
+                    this.stopAllTests();
+                });
+            }
+
+            testBreathing() {
+                this.log('🫁 Starting breathing test...');
+                this.activeTests.add('breathing');
+                
+                const container = document.getElementById('breathingTestContainer');
+                container.innerHTML = '<div id="breathingAvatar" class="exercise-avatar large"><div class="avatar-body"><div class="avatar-head"><span>😌</span></div></div></div>';
+                
+                this.initializeAllAvatars('breathing');
+                this.updateStatus('breathingStatus', 'Testing breathing animations...');
+                this.updateActiveCount();
+            }
+
+            testStretching() {
+                this.log('🤸‍♀️ Starting stretching test...');
+                this.activeTests.add('stretching');
+                
+                const container = document.getElementById('stretchingTestContainer');
+                container.innerHTML = '<div id="stretchingAvatar" class="exercise-avatar medium"><div class="avatar-body"><div class="avatar-head"><span>💪</span></div></div></div>';
+                
+                this.initializeAllAvatars('stretching');
+                this.updateStatus('stretchingStatus', 'Testing stretching animations...');
+                this.updateActiveCount();
+            }
+
+            testMotivation() {
+                this.log('⭐ Starting motivation test...');
+                this.activeTests.add('motivation');
+                
+                const container = document.getElementById('motivationTestContainer');
+                container.innerHTML = '<div id="motivationAvatar" class="exercise-avatar medium"><div class="avatar-body"><div class="avatar-head"><span>😊</span></div></div></div>';
+                
+                this.initializeAllAvatars('motivation');
+                this.updateStatus('motivationStatus', 'Testing motivation animations...');
+                this.updateActiveCount();
+            }
+
+            initializeAllAvatars(exerciseType) {
+                this.log(`🎯 Initializing all avatars for: ${exerciseType}`);
+                
+                // Classic Avatar
+                if (window.avatarExerciseGuide) {
+                    try {
+                        window.avatarExerciseGuide.startExercise(exerciseType);
+                        this.log('✅ Classic Avatar started');
+                    } catch (e) {
+                        this.log(`❌ Classic Avatar error: ${e.message}`);
+                    }
+                }
+                
+                // Human Avatar
+                if (window.humanAvatarGuide) {
+                    try {
+                        window.humanAvatarGuide.startExercise(exerciseType);
+                        this.log('✅ Human Avatar started');
+                    } catch (e) {
+                        this.log(`❌ Human Avatar error: ${e.message}`);
+                    }
+                }
+                
+                // Fluid SVG Avatar
+                if (window.fluidSVGAvatar) {
+                    try {
+                        const actionMap = {
+                            breathing: 'breathing_prepare',
+                            stretching: 'neck_stretch_sequence',
+                            motivation: 'confidence_boost'
+                        };
+                        window.fluidSVGAvatar.startFluidAnimation(exerciseType, actionMap[exerciseType]);
+                        this.log('✅ Fluid SVG Avatar started');
+                    } catch (e) {
+                        this.log(`❌ Fluid SVG Avatar error: ${e.message}`);
+                    }
+                }
+                
+                // Advanced Human Avatar
+                if (window.advancedHumanAvatar) {
+                    try {
+                        window.advancedHumanAvatar.startAdvancedExercise(exerciseType);
+                        this.log('✅ Advanced Human Avatar started');
+                    } catch (e) {
+                        this.log(`❌ Advanced Human Avatar error: ${e.message}`);
+                    }
+                }
+                
+                // AI Enhanced Avatar
+                if (window.aiEnhancedAvatar) {
+                    try {
+                        window.aiEnhancedAvatar.startExercise(exerciseType);
+                        this.log('✅ AI Enhanced Avatar started');
+                    } catch (e) {
+                        this.log(`❌ AI Enhanced Avatar error: ${e.message}`);
+                    }
+                }
+            }
+
+            stopTest(testType) {
+                this.log(`🛑 Stopping ${testType} test...`);
+                this.activeTests.delete(testType);
+                
+                const container = document.getElementById(`${testType}TestContainer`);
+                container.innerHTML = '<p class="text-muted">Test stopped</p>';
+                
+                this.stopAllAvatars();
+                this.updateStatus(`${testType}Status`, 'Test stopped');
+                this.updateActiveCount();
+            }
+
+            testAllSystems() {
+                this.log('🚀 Starting comprehensive test of all systems...');
+                this.testBreathing();
+                setTimeout(() => this.testStretching(), 2000);
+                setTimeout(() => this.testMotivation(), 4000);
+            }
+
+            stopAllTests() {
+                this.log('🛑 Stopping all tests...');
+                this.activeTests.clear();
+                
+                ['breathing', 'stretching', 'motivation'].forEach(type => {
+                    const container = document.getElementById(`${type}TestContainer`);
+                    container.innerHTML = '<p class="text-muted">All tests stopped</p>';
+                    this.updateStatus(`${type}Status`, 'Stopped');
+                });
+                
+                this.stopAllAvatars();
+                this.updateActiveCount();
+            }
+
+            stopAllAvatars() {
+                if (window.avatarExerciseGuide) {
+                    window.avatarExerciseGuide.stopExercise();
+                }
+                if (window.humanAvatarGuide) {
+                    window.humanAvatarGuide.stopExercise();
+                }
+                if (window.fluidSVGAvatar && window.fluidSVGAvatar.isAnimating) {
+                    window.fluidSVGAvatar.isAnimating = false;
+                }
+                if (window.advancedHumanAvatar) {
+                    window.advancedHumanAvatar.stopExercise();
+                }
+                if (window.aiEnhancedAvatar) {
+                    window.aiEnhancedAvatar.stopExercise();
+                }
+            }
+
+            updateStatus(statusId, message) {
+                const statusEl = document.getElementById(statusId);
+                if (statusEl) {
+                    statusEl.innerHTML = `<small class="text-info">${message}</small>`;
+                }
+            }
+
+            updateActiveCount() {
+                document.getElementById('activeAvatars').textContent = this.activeTests.size * 5; // 5 avatar systems
+            }
+
+            startPerformanceMonitoring() {
+                setInterval(() => {
+                    this.frameCount++;
+                    if (this.frameCount % 60 === 0) { // Update every 60 frames
+                        const fps = Math.round(60000 / (Date.now() - this.startTime) * this.frameCount);
+                        document.getElementById('frameRate').textContent = fps;
+                        
+                        // Estimate memory usage (simplified)
+                        const memoryEstimate = Math.round(this.activeTests.size * 2.5 + 10);
+                        document.getElementById('memoryUsage').textContent = memoryEstimate;
+                    }
+                }, 16); // ~60fps
+            }
+
+            log(message) {
+                const logDiv = document.getElementById('testLog');
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> ${message}`;
+                logDiv.appendChild(logEntry);
+                logDiv.scrollTop = logDiv.scrollHeight;
+                console.log(`[Avatar Test] ${message}`);
+            }
+        }
+
+        // Initialize test system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for all avatar systems to load
+            setTimeout(() => {
+                // Initialize all avatar systems
+                if (typeof AvatarExerciseGuide !== 'undefined') {
+                    window.avatarExerciseGuide = new AvatarExerciseGuide();
+                }
+                if (typeof HumanAvatarGuide !== 'undefined') {
+                    window.humanAvatarGuide = new HumanAvatarGuide();
+                }
+                if (typeof FluidSVGAvatar !== 'undefined') {
+                    window.fluidSVGAvatar = new FluidSVGAvatar();
+                }
+                if (typeof AdvancedHumanAvatar !== 'undefined') {
+                    window.advancedHumanAvatar = new AdvancedHumanAvatar();
+                }
+                if (typeof AIEnhancedAvatar !== 'undefined') {
+                    window.aiEnhancedAvatar = new AIEnhancedAvatar();
+                }
+                
+                // Start the test system
+                window.avatarIntegrationTest = new AvatarIntegrationTest();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

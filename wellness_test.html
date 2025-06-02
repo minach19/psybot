@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness Panel Test</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .wellness-panel {
+            position: relative;
+            width: 400px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 20px auto;
+        }
+        
+        .exercise-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .exercise-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .exercise-card h5 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .exercise-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wellness Panel Test</h1>
+    
+    <button class="test-button" onclick="testElements()">Test Elements</button>
+    <button class="test-button" onclick="testClicks()">Test Click Events</button>
+    
+    <div id="testStatus"></div>
+    
+    <!-- Wellness Panel -->
+    <div class="wellness-panel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4><i class="fas fa-spa"></i> Wellness Center</h4>
+        </div>
+        
+        <!-- Breathing Exercise -->
+        <div class="exercise-card" id="breathingExerciseCard">
+            <h5><i class="fas fa-lungs"></i> Breathing Exercise</h5>
+            <p>Guided breathing to reduce stress and anxiety</p>
+        </div>
+        
+        <!-- Office Stretching -->
+        <div class="exercise-card" id="stretchingExerciseCard">
+            <h5><i class="fas fa-hand-paper"></i> Office Stretching</h5>
+            <p>Simple desk stretches to relieve tension</p>
+        </div>
+        
+        <!-- Motivational Quote -->
+        <div class="exercise-card" id="motivationalQuoteCard">
+            <h5><i class="fas fa-quote-left"></i> Motivational Quote</h5>
+            <p>Inspiring quotes to boost your mood</p>
+        </div>
+    </div>
+    
+    <!-- Test Modals -->
+    <div id="breathingModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;">
+        <h3>Breathing Exercise Modal</h3>
+        <p>This modal would contain the breathing exercise.</p>
+        <button onclick="closeModal('breathingModal')">Close</button>
+    </div>
+    
+    <div id="stretchingModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;">
+        <h3>Stretching Exercise Modal</h3>
+        <p>This modal would contain the stretching exercise.</p>
+        <button onclick="closeModal('stretchingModal')">Close</button>
+    </div>
+    
+    <div id="quoteModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;">
+        <h3>Motivational Quote Modal</h3>
+        <p>This modal would contain the motivational quote.</p>
+        <button onclick="closeModal('quoteModal')">Close</button>
+    </div>
+    
+    <script>
+        function testElements() {
+            const statusDiv = document.getElementById('testStatus');
+            let status = '<div class="status success">Element Test Results:</div>';
+            
+            const elements = [
+                'breathingExerciseCard',
+                'stretchingExerciseCard',
+                'motivationalQuoteCard'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    status += `<div class="status success">✓ ${id} found</div>`;
+                } else {
+                    status += `<div class="status error">✗ ${id} not found</div>`;
+                }
+            });
+            
+            statusDiv.innerHTML = status;
+        }
+        
+        function testClicks() {
+            // Add click event listeners
+            document.getElementById('breathingExerciseCard')?.addEventListener('click', () => {
+                openModal('breathingModal');
+                console.log('Breathing exercise card clicked');
+            });
+            
+            document.getElementById('stretchingExerciseCard')?.addEventListener('click', () => {
+                openModal('stretchingModal');
+                console.log('Stretching exercise card clicked');
+            });
+            
+            document.getElementById('motivationalQuoteCard')?.addEventListener('click', () => {
+                openModal('quoteModal');
+                console.log('Motivational quote card clicked');
+            });
+            
+            const statusDiv = document.getElementById('testStatus');
+            statusDiv.innerHTML = '<div class="status success">Click events added! Try clicking the exercise cards.</div>';
+        }
+        
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'block';
+                console.log(`Opening modal: ${modalId}`);
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                console.log(`Closing modal: ${modalId}`);
+            }
+        }
+        
+        // Auto-run tests when page loads
+        window.onload = () => {
+            testElements();
+            testClicks();
+        };
+    </script>
+</body>
+</html>

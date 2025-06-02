@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsyBot CORS Test Tool (Final)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #4a4a4a;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .test-panel {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .success {
+            color: #2e7d32;
+        }
+        .error {
+            color: #c62828;
+        }
+        .info {
+            color: #1565c0;
+        }
+        #status-bar {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .status-success {
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            display: block;
+        }
+        .status-error {
+            background-color: #ffebee;
+            border: 1px solid #ef9a9a;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PsyBot CORS Test Tool (Final)</h1>
+        <div id="status-bar"></div>
+
+        <div class="test-panel">
+            <h2>Server Info</h2>
+            <p>
+                <strong>Your Current Origin:</strong> <span id="current-origin"></span><br>
+                <strong>XAMPP URL:</strong> <span id="xampp-url"></span><br>
+                <strong>Flask URL:</strong> <span id="flask-url"></span>
+            </p>
+        </div>
+
+        <div class="test-panel">
+            <h2>1. Basic CORS Test</h2>
+            <button id="test-cors">Run CORS Test</button>
+            <div id="cors-result"></div>
+        </div>
+
+        <div class="test-panel">
+            <h2>2. Test Save Avatar</h2>
+            <button id="test-save-avatar">Test Save Avatar</button>
+            <div id="save-result"></div>
+        </div>
+
+        <div class="test-panel">
+            <h2>3. Test Load Avatar</h2>
+            <button id="test-load-avatar">Test Load Avatar</button>
+            <div id="load-result"></div>
+        </div>
+
+        <div class="test-panel">
+            <h2>4. Header Analysis</h2>
+            <button id="analyze-headers">Analyze Response Headers</button>
+            <div id="header-result"></div>
+        </div>
+
+        <div class="test-panel">
+            <h2>5. Options Preflight Test</h2>
+            <button id="test-options">Test OPTIONS Preflight</button>
+            <div id="options-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Display current origin and server URLs
+        document.getElementById('current-origin').textContent = window.location.origin;
+        document.getElementById('xampp-url').textContent = 'http://localhost/psybot';
+        document.getElementById('flask-url').textContent = 'http://localhost:5000';
+
+        // Update status bar
+        function updateStatus(message, isSuccess = true) {
+            const statusBar = document.getElementById('status-bar');
+            statusBar.textContent = message;
+            statusBar.className = isSuccess ? 'status-success' : 'status-error';
+        }
+
+        // Format JSON for display
+        function formatJSON(obj) {
+            return JSON.stringify(obj, null, 4);
+        }
+
+        // Show result with formatting
+        function showResult(elementId, result, success = true) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = success ? 'success' : 'error';
+            statusDiv.textContent = success ? '✅ Test Passed' : '❌ Test Failed';
+            element.appendChild(statusDiv);
+            
+            const pre = document.createElement('pre');
+            pre.textContent = typeof result === 'object' ? formatJSON(result) : result;
+            element.appendChild(pre);
+        }
+
+        // 1. Basic CORS Test
+        document.getElementById('test-cors').addEventListener('click', async function() {
+            try {
+                const corsEndpoint = 'http://localhost/psybot/cors_simple_test.php';
+                updateStatus('Testing CORS with simple endpoint...', true);
+                
+                const response = await fetch(corsEndpoint, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                showResult('cors-result', data, true);
+                updateStatus('Basic CORS test successful!', true);
+                
+            } catch (error) {
+                showResult('cors-result', `Error: ${error.message}`, false);
+                updateStatus('CORS test failed: ' + error.message, false);
+                console.error('CORS Test Error:', error);
+            }
+        });
+
+        // 2. Test Save Avatar
+        document.getElementById('test-save-avatar').addEventListener('click', async function() {
+            try {
+                updateStatus('Testing avatar save functionality...', true);
+                
+                // Create minimal test data
+                const testData = {
+                    avatar_config: {
+                        name: 'Test Avatar',
+                        emoji: '🧪',
+                        timestamp: new Date().toISOString()
+                    },
+                    avatar_image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFeAJ5cUBR3wAAAABJRU5ErkJggg=='
+                };
+                
+                const response = await fetch('http://localhost/psybot/save_avatar.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(testData),
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                showResult('save-result', data, true);
+                updateStatus('Avatar save test successful!', true);
+                
+            } catch (error) {
+                showResult('save-result', `Error: ${error.message}`, false);
+                updateStatus('Avatar save test failed: ' + error.message, false);
+                console.error('Save Avatar Error:', error);
+            }
+        });
+
+        // 3. Test Load Avatar
+        document.getElementById('test-load-avatar').addEventListener('click', async function() {
+            try {
+                updateStatus('Testing avatar load functionality...', true);
+                
+                const response = await fetch('http://localhost/psybot/load_avatar.php', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                showResult('load-result', data, true);
+                updateStatus('Avatar load test successful!', true);
+                
+            } catch (error) {
+                showResult('load-result', `Error: ${error.message}`, false);
+                updateStatus('Avatar load test failed: ' + error.message, false);
+                console.error('Load Avatar Error:', error);
+            }
+        });
+
+        // 4. Header Analysis
+        document.getElementById('analyze-headers').addEventListener('click', async function() {
+            try {
+                updateStatus('Analyzing response headers...', true);
+                
+                // Using load_avatar.php for header testing
+                const response = await fetch('http://localhost/psybot/load_avatar.php', {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                // Extract headers
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                
+                // Check required CORS headers
+                const corsAnalysis = {
+                    headers: headers,
+                    analysis: {
+                        'Access-Control-Allow-Origin': headers['access-control-allow-origin'] ? 'Present ✅' : 'Missing ❌',
+                        'Access-Control-Allow-Methods': headers['access-control-allow-methods'] ? 'Present ✅' : 'Missing ❌',
+                        'Access-Control-Allow-Headers': headers['access-control-allow-headers'] ? 'Present ✅' : 'Missing ❌',
+                        'Access-Control-Allow-Credentials': headers['access-control-allow-credentials'] ? 'Present ✅' : 'Missing ❌'
+                    }
+                };
+                
+                showResult('header-result', corsAnalysis, true);
+                updateStatus('Header analysis complete!', true);
+                
+            } catch (error) {
+                showResult('header-result', `Error: ${error.message}`, false);
+                updateStatus('Header analysis failed: ' + error.message, false);
+                console.error('Header Analysis Error:', error);
+            }
+        });
+
+        // 5. Options Preflight Test
+        document.getElementById('test-options').addEventListener('click', async function() {
+            try {
+                updateStatus('Testing OPTIONS preflight request...', true);
+                
+                // Send an OPTIONS request to test preflight handling
+                const response = await fetch('http://localhost/psybot/save_avatar.php', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'content-type, x-requested-with',
+                        'Origin': window.location.origin
+                    },
+                    mode: 'cors'
+                });
+                
+                // Extract headers
+                const headers = {};
+                response.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+                
+                const preflightResult = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: headers,
+                    success: response.status === 200
+                };
+                
+                showResult('options-result', preflightResult, preflightResult.success);
+                updateStatus('OPTIONS preflight test complete!', preflightResult.success);
+                
+            } catch (error) {
+                showResult('options-result', `Error: ${error.message}`, false);
+                updateStatus('OPTIONS preflight test failed: ' + error.message, false);
+                console.error('OPTIONS Preflight Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

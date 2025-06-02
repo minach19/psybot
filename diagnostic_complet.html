@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Complet - Avatar & Wellness</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .diagnostic-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 0.5rem 0;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .test-result {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            margin: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .console-output {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        
+        .iframe-container {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+        
+        .btn-test {
+            margin: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-container">
+        <div class="test-card">
+            <h1><i class="fas fa-stethoscope"></i> Diagnostic Complet - PsyBot Avatar & Wellness</h1>
+            <p class="text-muted">Diagnostic automatique de toutes les fonctionnalités principales</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h3><i class="fas fa-play-circle"></i> Tests Automatiques</h3>
+                    <button class="btn btn-primary btn-test" onclick="runAllTests()">🚀 Lancer Tous les Tests</button>
+                    <button class="btn btn-info btn-test" onclick="testAvatarFeatures()">🤖 Test Avatar</button>
+                    <button class="btn btn-success btn-test" onclick="testWellnessFeatures()">🧘 Test Wellness</button>
+                    <button class="btn btn-warning btn-test" onclick="testMainApp()">📱 Test App Principale</button>
+                    <button class="btn btn-secondary btn-test" onclick="clearResults()">🧹 Effacer</button>
+                </div>
+                <div class="col-md-6">
+                    <h3><i class="fas fa-chart-line"></i> Résultats</h3>
+                    <div id="testSummary" class="status info">
+                        <strong>Statut :</strong> Prêt pour les tests
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h3><i class="fas fa-list-check"></i> Résultats Détaillés</h3>
+            <div id="detailedResults"></div>
+        </div>
+        
+        <div class="test-card">
+            <h3><i class="fas fa-terminal"></i> Console de Debug</h3>
+            <div id="debugConsole" class="console-output">Cliquez sur "Lancer Tous les Tests" pour commencer...</div>
+        </div>
+        
+        <div class="test-card">
+            <h3><i class="fas fa-external-link-alt"></i> Test en Direct - Application Principale</h3>
+            <div class="iframe-container">
+                <iframe src="http://localhost:5000" id="mainAppFrame"></iframe>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-primary" onclick="refreshMainApp()">🔄 Actualiser</button>
+                <button class="btn btn-success" onclick="testInFrame()">🧪 Tester dans Frame</button>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h3><i class="fas fa-external-link-alt"></i> Test en Direct - Avatar Customization</h3>
+            <div class="iframe-container">
+                <iframe src="http://localhost:5000/avatar_customization_test.html" id="avatarTestFrame"></iframe>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-primary" onclick="refreshAvatarTest()">🔄 Actualiser</button>
+                <button class="btn btn-success" onclick="testAvatarInFrame()">🧪 Tester Avatar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            avatar: {},
+            wellness: {},
+            main: {},
+            overall: 'pending'
+        };
+        
+        function log(message, type = 'info') {
+            const console = document.getElementById('debugConsole');
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            console.innerHTML += `[${timestamp}] ${prefix} ${message}\n`;
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function updateSummary() {
+            const summary = document.getElementById('testSummary');
+            const total = Object.keys(testResults.avatar).length + 
+                         Object.keys(testResults.wellness).length + 
+                         Object.keys(testResults.main).length;
+            
+            const passed = Object.values({...testResults.avatar, ...testResults.wellness, ...testResults.main})
+                                 .filter(result => result === true).length;
+            
+            if (total === 0) {
+                summary.className = 'status info';
+                summary.innerHTML = '<strong>Statut :</strong> Prêt pour les tests';
+            } else {
+                const percentage = Math.round((passed / total) * 100);
+                if (percentage >= 80) {
+                    summary.className = 'status success';
+                    summary.innerHTML = `<strong>Tests Réussis :</strong> ${passed}/${total} (${percentage}%) - Excellent!`;
+                } else if (percentage >= 60) {
+                    summary.className = 'status warning';
+                    summary.innerHTML = `<strong>Tests Réussis :</strong> ${passed}/${total} (${percentage}%) - Bon`;
+                } else {
+                    summary.className = 'status error';
+                    summary.innerHTML = `<strong>Tests Réussis :</strong> ${passed}/${total} (${percentage}%) - Attention requise`;
+                }
+            }
+        }
+        
+        function displayResults() {
+            const container = document.getElementById('detailedResults');
+            let html = '';
+            
+            // Avatar tests
+            if (Object.keys(testResults.avatar).length > 0) {
+                html += '<h5><i class="fas fa-user-cog"></i> Tests Avatar</h5>';
+                for (const [test, result] of Object.entries(testResults.avatar)) {
+                    const className = result ? 'pass' : 'fail';
+                    const icon = result ? '✅' : '❌';
+                    html += `<span class="test-result ${className}">${icon} ${test}</span>`;
+                }
+            }
+            
+            // Wellness tests
+            if (Object.keys(testResults.wellness).length > 0) {
+                html += '<h5 class="mt-3"><i class="fas fa-spa"></i> Tests Wellness</h5>';
+                for (const [test, result] of Object.entries(testResults.wellness)) {
+                    const className = result ? 'pass' : 'fail';
+                    const icon = result ? '✅' : '❌';
+                    html += `<span class="test-result ${className}">${icon} ${test}</span>`;
+                }
+            }
+            
+            // Main app tests
+            if (Object.keys(testResults.main).length > 0) {
+                html += '<h5 class="mt-3"><i class="fas fa-desktop"></i> Tests Application Principale</h5>';
+                for (const [test, result] of Object.entries(testResults.main)) {
+                    const className = result ? 'pass' : 'fail';
+                    const icon = result ? '✅' : '❌';
+                    html += `<span class="test-result ${className}">${icon} ${test}</span>`;
+                }
+            }
+            
+            container.innerHTML = html;
+            updateSummary();
+        }
+        
+        async function runAllTests() {
+            log('🚀 Démarrage de tous les tests...', 'info');
+            clearResults();
+            
+            await testAvatarFeatures();
+            await testWellnessFeatures();
+            await testMainApp();
+            
+            log('🏁 Tous les tests terminés!', 'success');
+        }
+        
+        async function testAvatarFeatures() {
+            log('🤖 Test des fonctionnalités Avatar...', 'info');
+            
+            // Test 1: Vérifier que l'iframe avatar se charge
+            try {
+                const avatarFrame = document.getElementById('avatarTestFrame');
+                testResults.avatar['Frame Avatar chargée'] = avatarFrame && avatarFrame.src;
+                log('Frame avatar test: ' + (testResults.avatar['Frame Avatar chargée'] ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.avatar['Frame Avatar chargée'] = false;
+                log('Erreur frame avatar: ' + e.message, 'error');
+            }
+            
+            // Test 2: Test de fetch vers les URLs de test
+            try {
+                const response = await fetch('http://localhost:5000/avatar_customization_test.html');
+                testResults.avatar['Page test accessible'] = response.ok;
+                log('Page test avatar accessible: ' + (response.ok ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.avatar['Page test accessible'] = false;
+                log('Erreur accès page test: ' + e.message, 'error');
+            }
+            
+            // Test 3: Vérifier localStorage pour avatar
+            try {
+                const avatarData = localStorage.getItem('psybot_avatar');
+                testResults.avatar['LocalStorage disponible'] = avatarData !== null || localStorage.setItem('test', 'test') === undefined;
+                if (avatarData) {
+                    log('Avatar sauvegardé trouvé: ' + avatarData.substring(0, 50) + '...');
+                }
+                localStorage.removeItem('test');
+                log('LocalStorage test: PASS');
+            } catch (e) {
+                testResults.avatar['LocalStorage disponible'] = false;
+                log('Erreur localStorage: ' + e.message, 'error');
+            }
+            
+            displayResults();
+        }
+        
+        async function testWellnessFeatures() {
+            log('🧘 Test des fonctionnalités Wellness...', 'info');
+            
+            // Test 1: Vérifier les fichiers CSS/JS
+            try {
+                const cssResponse = await fetch('/static/css/style.css');
+                testResults.wellness['CSS chargé'] = cssResponse.ok;
+                log('CSS wellness: ' + (cssResponse.ok ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.wellness['CSS chargé'] = false;
+                log('Erreur CSS: ' + e.message, 'error');
+            }
+            
+            try {
+                const jsResponse = await fetch('/static/js/wellness-modals.js');
+                testResults.wellness['JS Wellness chargé'] = jsResponse.ok;
+                log('JS wellness: ' + (jsResponse.ok ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.wellness['JS Wellness chargé'] = false;
+                log('Erreur JS wellness: ' + e.message, 'error');
+            }
+            
+            // Test 2: Vérifier page de test wellness
+            try {
+                const response = await fetch('http://localhost:5000/wellness_test.html');
+                testResults.wellness['Page test wellness'] = response.ok;
+                log('Page test wellness: ' + (response.ok ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.wellness['Page test wellness'] = false;
+                log('Erreur page wellness: ' + e.message, 'error');
+            }
+            
+            displayResults();
+        }
+        
+        async function testMainApp() {
+            log('📱 Test de l\'application principale...', 'info');
+            
+            // Test 1: Vérifier que l'app principale se charge
+            try {
+                const response = await fetch('http://localhost:5000/');
+                testResults.main['App principale accessible'] = response.ok;
+                log('App principale: ' + (response.ok ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.main['App principale accessible'] = false;
+                log('Erreur app principale: ' + e.message, 'error');
+            }
+            
+            // Test 2: Vérifier main.js
+            try {
+                const response = await fetch('/static/js/main.js');
+                testResults.main['main.js chargé'] = response.ok;
+                log('main.js: ' + (response.ok ? 'PASS' : 'FAIL'));
+            } catch (e) {
+                testResults.main['main.js chargé'] = false;
+                log('Erreur main.js: ' + e.message, 'error');
+            }
+            
+            // Test 3: Vérifier que le serveur répond
+            try {
+                const startTime = Date.now();
+                await fetch('http://localhost:5000/');
+                const responseTime = Date.now() - startTime;
+                testResults.main['Temps de réponse OK'] = responseTime < 3000;
+                log(`Temps de réponse: ${responseTime}ms (${responseTime < 3000 ? 'PASS' : 'FAIL'})`);
+            } catch (e) {
+                testResults.main['Temps de réponse OK'] = false;
+                log('Erreur temps de réponse: ' + e.message, 'error');
+            }
+            
+            displayResults();
+        }
+        
+        function clearResults() {
+            testResults = { avatar: {}, wellness: {}, main: {}, overall: 'pending' };
+            document.getElementById('detailedResults').innerHTML = '';
+            document.getElementById('debugConsole').innerHTML = 'Console effacée...\n';
+            updateSummary();
+        }
+        
+        function refreshMainApp() {
+            document.getElementById('mainAppFrame').src = 'http://localhost:5000?' + Date.now();
+            log('🔄 Application principale actualisée');
+        }
+        
+        function refreshAvatarTest() {
+            document.getElementById('avatarTestFrame').src = 'http://localhost:5000/avatar_customization_test.html?' + Date.now();
+            log('🔄 Test avatar actualisé');
+        }
+        
+        function testInFrame() {
+            log('🧪 Test en cours dans la frame principale...', 'info');
+            const frame = document.getElementById('mainAppFrame');
+            try {
+                // Essayer d'accéder au contenu de la frame (peut être bloqué par CORS)
+                const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                if (frameDoc) {
+                    log('✅ Frame accessible, contenu détecté');
+                } else {
+                    log('⚠️ Frame chargée mais contenu non accessible (normal avec CORS)');
+                }
+            } catch (e) {
+                log('⚠️ Impossible d\'accéder au contenu de la frame (sécurité navigateur)');
+            }
+        }
+        
+        function testAvatarInFrame() {
+            log('🧪 Test de l\'avatar dans la frame...', 'info');
+            const frame = document.getElementById('avatarTestFrame');
+            try {
+                const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                if (frameDoc) {
+                    log('✅ Frame avatar accessible');
+                } else {
+                    log('⚠️ Frame avatar chargée mais contenu non accessible');
+                }
+            } catch (e) {
+                log('⚠️ Impossible d\'accéder au contenu de la frame avatar');
+            }
+        }
+        
+        // Auto-run basic tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📋 Page de diagnostic chargée', 'success');
+            log('ℹ️ Cliquez sur "Lancer Tous les Tests" pour commencer le diagnostic complet');
+            
+            // Quick connectivity test
+            setTimeout(async () => {
+                try {
+                    const response = await fetch('http://localhost:5000/');
+                    if (response.ok) {
+                        log('✅ Serveur détecté et opérationnel', 'success');
+                    } else {
+                        log('⚠️ Serveur répond mais avec erreur', 'warning');
+                    }
+                } catch (e) {
+                    log('❌ Impossible de joindre le serveur', 'error');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

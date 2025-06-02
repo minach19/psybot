@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsyBot CORS Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #667eea;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            border: 1px solid #ddd;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .info {
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>PsyBot CORS and Server Test</h1>
+        <p>This tool will help diagnose issues with CORS and server connectivity.</p>
+    </div>
+
+    <div class="card">
+        <h2>1. Check CORS Diagnostic Endpoint</h2>
+        <p>Tests if the CORS headers are properly set on the PHP server.</p>
+        <button id="testCors">Test CORS Configuration</button>
+        <div id="corsResult"></div>
+    </div>
+
+    <div class="card">
+        <h2>2. Test Avatar Save Endpoint</h2>
+        <p>Tests if the save_avatar.php endpoint is working correctly.</p>
+        <button id="testSave">Test Avatar Save</button>
+        <div id="saveResult"></div>
+    </div>
+
+    <div class="card">
+        <h2>3. Test Avatar Load Endpoint</h2>
+        <p>Tests if the load_avatar.php endpoint is working correctly.</p>
+        <button id="testLoad">Test Avatar Load</button>
+        <div id="loadResult"></div>
+    </div>
+
+    <div class="card">
+        <h2>4. Current Connection Information</h2>
+        <pre id="connectionInfo"></pre>
+    </div>
+
+    <script>
+        // Display connection information
+        document.addEventListener('DOMContentLoaded', function() {
+            const connInfo = {
+                "current_url": window.location.href,
+                "hostname": window.location.hostname,
+                "port": window.location.port,
+                "protocol": window.location.protocol,
+                "user_agent": navigator.userAgent
+            };
+            document.getElementById('connectionInfo').textContent = JSON.stringify(connInfo, null, 2);
+        });
+
+        // Test CORS configuration
+        document.getElementById('testCors').addEventListener('click', function() {
+            const resultDiv = document.getElementById('corsResult');
+            resultDiv.innerHTML = '<p class="info">Testing CORS configuration...</p>';
+            
+            // Try both relative and absolute paths
+            const corsPath = window.location.hostname === 'localhost' ? 
+                '/cors_diagnostic.php' : 
+                window.location.protocol + '//' + window.location.hostname + '/psybot/cors_diagnostic.php';
+            
+            fetch(corsPath, {
+                method: 'OPTIONS',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text().then(text => {
+                        resultDiv.innerHTML = '<p class="success">CORS preflight request succeeded!</p>';
+                        
+                        // Now try a POST request
+                        return fetch(corsPath, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({test: 'data'})
+                        });
+                    });
+                } else {
+                    throw new Error(`Preflight request failed with status: ${response.status}`);
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error(`POST request failed with status: ${response.status}`);
+                }
+            })
+            .then(data => {
+                resultDiv.innerHTML += '<p class="success">POST request succeeded!</p>';
+                resultDiv.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                resultDiv.innerHTML += `<p>Try accessing directly: <a href="${corsPath}" target="_blank">${corsPath}</a></p>`;
+            });
+        });
+
+        // Test avatar save endpoint
+        document.getElementById('testSave').addEventListener('click', function() {
+            const resultDiv = document.getElementById('saveResult');
+            resultDiv.innerHTML = '<p class="info">Testing avatar save endpoint...</p>';
+            
+            const savePath = window.location.hostname === 'localhost' ? 
+                '/save_avatar.php' : 
+                window.location.protocol + '//' + window.location.hostname + '/psybot/save_avatar.php';
+            
+            // Create a minimal test avatar config
+            const testData = {
+                avatar: {
+                    name: "Test Avatar",
+                    emoji: "🧪",
+                    skinColor: "light",
+                    outfit: {
+                        style: "casual"
+                    }
+                },
+                timestamp: Date.now()
+            };
+            
+            fetch(savePath, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(testData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error(`Request failed with status: ${response.status}`);
+                }
+            })
+            .then(data => {
+                resultDiv.innerHTML = '<p class="success">Avatar save endpoint is working!</p>';
+                resultDiv.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                resultDiv.innerHTML += `<p>Attempted to access: ${savePath}</p>`;
+                resultDiv.innerHTML += '<p>Try these fixes:</p>';
+                resultDiv.innerHTML += '<ul>';
+                resultDiv.innerHTML += '<li>Ensure Apache mod_headers is enabled</li>';
+                resultDiv.innerHTML += '<li>Check .htaccess file is being processed</li>';
+                resultDiv.innerHTML += '<li>Verify save_avatar.php has correct CORS headers</li>';
+                resultDiv.innerHTML += '</ul>';
+            });
+        });
+
+        // Test avatar load endpoint
+        document.getElementById('testLoad').addEventListener('click', function() {
+            const resultDiv = document.getElementById('loadResult');
+            resultDiv.innerHTML = '<p class="info">Testing avatar load endpoint...</p>';
+            
+            const loadPath = window.location.hostname === 'localhost' ? 
+                '/load_avatar.php' : 
+                window.location.protocol + '//' + window.location.hostname + '/psybot/load_avatar.php';
+            
+            fetch(loadPath)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error(`Request failed with status: ${response.status}`);
+                }
+            })
+            .then(data => {
+                resultDiv.innerHTML = '<p class="success">Avatar load endpoint is working!</p>';
+                resultDiv.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                resultDiv.innerHTML += `<p>Attempted to access: ${loadPath}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
